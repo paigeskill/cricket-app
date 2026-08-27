@@ -3,7 +3,7 @@
 ## 1. Technical Context
 
 - **Framework**: React.js
-- **Styling**: CSS with a modern, dark theme.
+- **Styling**: MUI (Material-UI) components with a modern, dark theme.
 - **Data**: Mock data will be stored in a JavaScript file.
 - **Deployment**: Static site hosting (e.g., Netlify, Vercel, GitHub Pages).
 - **State Management**: React Context API for simple state management if needed.
@@ -34,7 +34,6 @@
 |   |   |-- mockData.js
 |   |-- App.js
 |   |-- index.js
-|   |-- style.css
 |-- package.json
 ```
 

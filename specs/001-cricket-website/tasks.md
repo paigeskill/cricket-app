@@ -17,14 +17,14 @@
 - [ ] T005 [US1] Create the `LandingPage.js` component in `src/pages/` with links to the other pages
 - [ ] T006 [US1] Create the `EnterGamePage.js` component in `src/pages/`
 - [ ] T007 [US1] Create the `GameForm.js` component in `src/components/` with all the fields from the data model
-- [ ] T008 [US1] Add routing for the `/enter-game` path to display the `EnterGamePage` component
+- [ ] T008 [US1] Add routing for the `/enter-game` path to display the `EnterGamePage` component including back button to navigate back to home
 
 ## Phase 4: User Story 2 - View Historical Stats
 
 - [ ] T009 [US2] Create the `HistoricalStatsPage.js` component in `src/pages/`
 - [ ] T010 [US2] Create the `StatsTable.js` component in `src/components/` to display the game data
 - [ ] T011 [US2] Create the `mockData.js` file in `src/data/` with the mock game data
-- [ ] T012 [US2] Add routing for the `/historical-stats` path to display the `HistoricalStatsPage` component
+- [ ] T012 [US2] Add routing for the `/historical-stats` path to display the `HistoricalStatsPage` component including back button to navigate back to home
 
 ## Phase 5: Testing & Polish
 

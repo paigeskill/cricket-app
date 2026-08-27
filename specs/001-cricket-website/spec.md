@@ -24,6 +24,7 @@ A modern and sleek website for cricket enthusiasts to record and view game stati
 - **FR3**: The "View Historical Stats" page must display a table of past games with the same information as the form in FR2.
 - **FR4**: The historical stats page must be populated with mock data for all games played in 2026.
 - **FR5**: All pages must have tests to ensure the functionality and appearance of the website.
+- **FR6**: The header must contain a burger menu icon that, when clicked, opens a navigation drawer. The drawer will contain links to the "Enter New Game" and "View Historical Stats" pages.
 
 ## 4. Success Criteria
 
