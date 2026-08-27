@@ -14,11 +14,13 @@ A modern and sleek website for cricket enthusiasts to record and view game stati
 - **FR1**: The website must have a landing page with two main calls to action: "Enter New Game" and "View Historical Stats".
 - **FR2**: The "Enter New Game" page must contain a form to input the following information about a game:
     - Date
-    - Team 1
-    - Team 2
-    - Score 1
-    - Score 2
-    - Result
+    - Club
+    - Opponent
+    - Home or Away
+    - Number of runs scored
+    - Batting number
+    - Dismissal
+    - Out?
 - **FR3**: The "View Historical Stats" page must display a table of past games with the same information as the form in FR2.
 - **FR4**: The historical stats page must be populated with mock data for all games played in 2026.
 - **FR5**: All pages must have tests to ensure the functionality and appearance of the website.
@@ -33,11 +35,13 @@ A modern and sleek website for cricket enthusiasts to record and view game stati
 
 - **Game**
     - `date`: Date - The date the game was played.
-    - `team1`: String - The name of the first team.
-    - `team2`: String - The name of the second team.
-    - `score1`: String - The score of the first team.
-    - `score2`: String - The score of the second team.
-    - `result`: String - A description of the game's result.
+    - `club`: String - The name of the user's club.
+    - `opponent`: String - The name of the opposing team.
+    - `location`: String - "Home" or "Away".
+    - `runs_scored`: Number - The number of runs the user scored.
+    - `batting_number`: Number - The user's batting position.
+    - `dismissal`: String - How the user was dismissed (e.g., "Bowled", "Caught", "LBW").
+    - `is_out`: Boolean - Whether the user was out or not.
 
 ## 6. Assumptions
 

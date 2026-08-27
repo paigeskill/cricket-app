@@ -2,8 +2,10 @@
 
 - **Game**
     - `date`: Date - The date the game was played.
-    - `team1`: String - The name of the first team.
-    - `team2`: String - The name of the second team.
-    - `score1`: String - The score of the first team.
-    - `score2`: String - The score of the second team.
-    - `result`: String - A description of the game's result.
+    - `club`: String - The name of the user's club.
+    - `opponent`: String - The name of the opposing team.
+    - `location`: String - "Home" or "Away".
+    - `runs_scored`: Number - The number of runs the user scored.
+    - `batting_number`: Number - The user's batting position.
+    - `dismissal`: String - How the user was dismissed (e.g., "Bowled", "Caught", "LBW").
+    - `is_out`: Boolean - Whether the user was out or not.
