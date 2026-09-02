@@ -1,0 +1,1 @@
+This directory is reserved for public API or external server contracts. Since the expansion is front-end local storage only, no public external contracts are required.
