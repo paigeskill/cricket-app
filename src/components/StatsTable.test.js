@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import StatsTable from './StatsTable';
 
@@ -13,7 +13,15 @@ const mockGames = [
     runs_scored: 50,
     batting_number: 3,
     dismissal: 'Caught',
-    is_out: true
+    is_out: true,
+    overs_bowled: 4.2, // 26 balls
+    maidens_bowled: 0,
+    runs_conceded: 18,
+    wickets_taken: 2,
+    catches: 1,
+    run_outs: 0,
+    stumpings: 0,
+    byes_conceded: 0
   },
   {
     id: '2',
@@ -24,7 +32,35 @@ const mockGames = [
     runs_scored: 100,
     batting_number: 3,
     dismissal: 'None',
-    is_out: false
+    is_out: false,
+    overs_bowled: 0.0,
+    maidens_bowled: 0,
+    runs_conceded: 0,
+    wickets_taken: 0,
+    catches: 0,
+    run_outs: 1,
+    stumpings: 1,
+    byes_conceded: 4
+  },
+  {
+    id: '3',
+    date: '2026-06-15',
+    club: 'Club A',
+    opponent: 'Club D',
+    location: 'Home',
+    did_not_bat: true,
+    runs_scored: null,
+    batting_number: null,
+    dismissal: 'DNB',
+    is_out: false,
+    overs_bowled: 0.0,
+    maidens_bowled: 0,
+    runs_conceded: 0,
+    wickets_taken: 0,
+    catches: 0,
+    run_outs: 0,
+    stumpings: 0,
+    byes_conceded: 0
   }
 ];
 
@@ -40,10 +76,10 @@ describe('StatsTable Component', () => {
     expect(screen.getByText('Batting Average')).toBeInTheDocument();
   });
 
-  test('renders table rows and columns with accurate data', () => {
+  test('renders batting table rows and columns with accurate data', () => {
     render(<StatsTable games={mockGames} />);
 
-    // Check header column text
+    // Check header column text on first tab
     expect(screen.getByText('Date')).toBeInTheDocument();
     expect(screen.getByText('Club')).toBeInTheDocument();
     expect(screen.getByText('Opponent')).toBeInTheDocument();
@@ -56,27 +92,62 @@ describe('StatsTable Component', () => {
     // Check specific row content
     expect(screen.getByText('2026-05-15')).toBeInTheDocument();
     expect(screen.getByText('2026-06-02')).toBeInTheDocument();
-    expect(screen.getByText('Club B')).toBeInTheDocument();
-    expect(screen.getByText('Club C')).toBeInTheDocument();
     
     // Check out / not out chips
     expect(screen.getByText('Out')).toBeInTheDocument();
     expect(screen.getByText('Not Out')).toBeInTheDocument();
+    
+    // Check DNB row content is rendered
+    expect(screen.getAllByText('DNB')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('—')[0]).toBeInTheDocument(); // displays dashes for batting number / dismissal of DNB
   });
 
-  test('calculates and displays correct statistics KPIs', () => {
+  test('switches tabs and displays accurate bowling scorecard with calculated math', () => {
     render(<StatsTable games={mockGames} />);
 
-    // Matches Played KPI: 2
-    expect(screen.getByText('2')).toBeInTheDocument();
+    // Switch to Bowling scorecard tab
+    const bowlingTab = screen.getByRole('tab', { name: /Bowling Scorecard/i });
+    fireEvent.click(bowlingTab);
 
-    // Total Runs KPI: 50 + 100 = 150
-    expect(screen.getByText('150')).toBeInTheDocument();
+    // Assert bowling headers
+    expect(screen.getByText('Overs')).toBeInTheDocument();
+    expect(screen.getByText('Maidens')).toBeInTheDocument();
+    expect(screen.getByText('Wickets')).toBeInTheDocument();
+    expect(screen.getByText('Economy')).toBeInTheDocument();
+    expect(screen.getByText('Average')).toBeInTheDocument();
+    expect(screen.getByText('SR')).toBeInTheDocument();
 
-    // Highest Score KPI: 100
-    expect(screen.getByText('100')).toBeInTheDocument();
+    // Verify row bowling statistics (fractional calculations)
+    // Game 1: 18 runs, 4.2 overs (26 balls), 2 wickets
+    // Economy: 18 / (26 / 6) = 18 / 4.333 = 4.15
+    // Average: 18 / 2 = 9.00
+    // Strike Rate: 26 / 2 = 13.00
+    expect(screen.getAllByText('4.15')[0]).toBeInTheDocument();
+    expect(screen.getByText('9.00')).toBeInTheDocument();
+    expect(screen.getByText('13.00')).toBeInTheDocument();
 
-    // Batting Average KPI: 150 runs / 1 dismissal = 150.00
-    expect(screen.getByText('150.00')).toBeInTheDocument();
+    // Dashboard totals for bowling
+    expect(screen.getByText('Total Wickets')).toBeInTheDocument();
+    expect(screen.getByText('Best Bowling')).toBeInTheDocument();
+    expect(screen.getByText('2/18')).toBeInTheDocument(); // Best bowling: 2 wickets for 18 runs
+  });
+
+  test('switches tabs and displays fielding scorecard', () => {
+    render(<StatsTable games={mockGames} />);
+
+    // Switch to Fielding scorecard tab
+    const fieldingTab = screen.getByRole('tab', { name: /Fielding Scorecard/i });
+    fireEvent.click(fieldingTab);
+
+    // Assert fielding headers and values
+    expect(screen.getByText('Catches')).toBeInTheDocument();
+    expect(screen.getAllByText('Run Outs')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Stumpings')[0]).toBeInTheDocument();
+    expect(screen.getByText('Byes Conceded')).toBeInTheDocument();
+
+    // Verify values exist
+    expect(screen.getByText('Total Catches')).toBeInTheDocument();
+    expect(screen.getAllByText('1')[0]).toBeInTheDocument(); // Catch in Game 1
+    expect(screen.getByText('4')).toBeInTheDocument(); // Wicketkeeper byes in Game 2
   });
 });

@@ -8,7 +8,15 @@ export const initialMockGames = [
     runs_scored: 45,
     batting_number: 3,
     dismissal: 'Caught',
-    is_out: true
+    is_out: true,
+    overs_bowled: 4.0,
+    maidens_bowled: 0,
+    runs_conceded: 24,
+    wickets_taken: 1,
+    catches: 1,
+    run_outs: 0,
+    stumpings: 0,
+    byes_conceded: 0
   },
   {
     id: '2',
@@ -19,7 +27,15 @@ export const initialMockGames = [
     runs_scored: 82,
     batting_number: 3,
     dismissal: 'None',
-    is_out: false
+    is_out: false,
+    overs_bowled: 6.0,
+    maidens_bowled: 1,
+    runs_conceded: 32,
+    wickets_taken: 3,
+    catches: 0,
+    run_outs: 1,
+    stumpings: 0,
+    byes_conceded: 0
   },
   {
     id: '3',
@@ -30,7 +46,15 @@ export const initialMockGames = [
     runs_scored: 12,
     batting_number: 4,
     dismissal: 'LBW',
-    is_out: true
+    is_out: true,
+    overs_bowled: 2.0,
+    maidens_bowled: 0,
+    runs_conceded: 15,
+    wickets_taken: 0,
+    catches: 0,
+    run_outs: 0,
+    stumpings: 0,
+    byes_conceded: 0
   },
   {
     id: '4',
@@ -41,7 +65,15 @@ export const initialMockGames = [
     runs_scored: 0,
     batting_number: 3,
     dismissal: 'Bowled',
-    is_out: true
+    is_out: true,
+    overs_bowled: 0.0,
+    maidens_bowled: 0,
+    runs_conceded: 0,
+    wickets_taken: 0,
+    catches: 2,
+    run_outs: 0,
+    stumpings: 1,
+    byes_conceded: 4
   },
   {
     id: '5',
@@ -52,7 +84,15 @@ export const initialMockGames = [
     runs_scored: 58,
     batting_number: 3,
     dismissal: 'Run Out',
-    is_out: true
+    is_out: true,
+    overs_bowled: 5.2,
+    maidens_bowled: 0,
+    runs_conceded: 28,
+    wickets_taken: 2,
+    catches: 1,
+    run_outs: 0,
+    stumpings: 0,
+    byes_conceded: 0
   },
   {
     id: '6',
@@ -63,6 +103,14 @@ export const initialMockGames = [
     runs_scored: 104,
     batting_number: 3,
     dismissal: 'None',
-    is_out: false
+    is_out: false,
+    overs_bowled: 0.0,
+    maidens_bowled: 0,
+    runs_conceded: 0,
+    wickets_taken: 0,
+    catches: 1,
+    run_outs: 1,
+    stumpings: 0,
+    byes_conceded: 0
   }
 ];

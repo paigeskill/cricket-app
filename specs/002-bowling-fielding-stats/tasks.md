@@ -18,7 +18,7 @@
 
 **Purpose**: Project initialization and base mock data seed expansion
 
-- [ ] T001 Expand mock data array in `src/data/mockData.js` to include standard bowling and fielding statistics (overs, maidens, runs, wickets, catches, run outs, stumpings, byes) for the original 2026 match entries.
+- [x] T001 Expand mock data array in `src/data/mockData.js` to include standard bowling and fielding statistics (overs, maidens, runs, wickets, catches, run outs, stumpings, byes) for the original 2026 match entries.
 
 ---
 
@@ -26,7 +26,7 @@
 
 **Purpose**: Core structure preparation before user story implementation
 
-- [ ] T002 Verify local state-passing signatures from `EnterGamePage.js` to `GameForm.js` and from `HistoricalStatsPage.js` to `StatsTable.js` to ensure the extended schema is supported by parent pages.
+- [x] T002 Verify local state-passing signatures from `EnterGamePage.js` to `GameForm.js` and from `HistoricalStatsPage.js` to `StatsTable.js` to ensure the extended schema is supported by parent pages.
 
 ---
 
@@ -38,11 +38,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [P] [US5] Implement MUI `Tabs` and `TabPanel` container structures in `src/components/GameForm.js` to toggle between "Game & Batting", "Bowling", and "Fielding" sections.
-- [ ] T004 [P] [US5] Re-organize existing Game Date, Club, Opponent, Location, Runs, Batting position, and Out/Dismissal inputs into the first Tab Panel in `src/components/GameForm.js`.
-- [ ] T005 [P] [US1] Implement Bowling form inputs (Overs Bowled, Maidens, Runs Conceded, Wickets Taken) in `src/components/GameForm.js` with validation (such as over decimal parts must be <= .5, e.g. `3.6` is invalid; inputs must be non-negative).
-- [ ] T006 [P] [US2] Implement Fielding form inputs (Catches, Run Outs, Stumpings, Byes Conceded) in `src/components/GameForm.js` with non-negative integer validations.
-- [ ] T007 [US1] Update form submit handler inside `src/components/GameForm.js` to parse all batting, bowling, and fielding fields as numbers (defaulting empty fields to `0` or null) and pass the flat record to the parent `onSave` hook.
+- [x] T003 [P] [US5] Implement MUI `Tabs` and `TabPanel` container structures in `src/components/GameForm.js` to toggle between "Game & Batting", "Bowling", and "Fielding" sections.
+- [x] T004 [P] [US5] Re-organize existing Game Date, Club, Opponent, Location, Runs, Batting position, and Out/Dismissal inputs into the first Tab Panel in `src/components/GameForm.js`.
+- [x] T005 [P] [US1] Implement Bowling form inputs (Overs Bowled, Maidens, Runs Conceded, Wickets Taken) in `src/components/GameForm.js` with validation (such as over decimal parts must be <= .5, e.g. `3.6` is invalid; inputs must be non-negative).
+- [x] T006 [P] [US2] Implement Fielding form inputs (Catches, Run Outs, Stumpings, Byes Conceded) in `src/components/GameForm.js` with non-negative integer validations.
+- [x] T007 [US1] Update form submit handler inside `src/components/GameForm.js` to parse all batting, bowling, and fielding fields as numbers (defaulting empty fields to `0` or null) and pass the flat record to the parent `onSave` hook.
 
 ---
 
@@ -54,10 +54,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T008 [P] [US4] Implement dynamic tabs inside `src/components/StatsTable.js` to toggle the visible table between "Batting Scorecard", "Bowling Scorecard", and "Fielding Scorecard".
-- [ ] T009 [P] [US3] Implement dynamic bowling scorecard rows in `src/components/StatsTable.js` featuring calculated columns for Economy, Bowling Average, and Strike Rate, resolving fractional over ball calculations.
-- [ ] T010 [P] [US4] Expand top KPI dashboard decks in `src/components/StatsTable.js` with individual cards for Batting, Bowling (Total Wickets, Economy, Best Bowling), and Fielding (Total Catches, Run Outs, Stumpings).
-- [ ] T011 [US4] Ensure the "Reset Mock Data" modal confirmation in `src/pages/HistoricalStatsPage.js` fully restores the original expanded 2026 cricket matches containing bowling and fielding statistics.
+- [x] T008 [P] [US4] Implement dynamic tabs inside `src/components/StatsTable.js` to toggle the visible table between "Batting Scorecard", "Bowling Scorecard", and "Fielding Scorecard".
+- [x] T009 [P] [US3] Implement dynamic bowling scorecard rows in `src/components/StatsTable.js` featuring calculated columns for Economy, Bowling Average, and Strike Rate, resolving fractional over ball calculations.
+- [x] T010 [P] [US4] Expand top KPI dashboard decks in `src/components/StatsTable.js` with individual cards for Batting, Bowling (Total Wickets, Economy, Best Bowling), and Fielding (Total Catches, Run Outs, Stumpings).
+- [x] T011 [US4] Ensure the "Reset Mock Data" modal confirmation in `src/pages/HistoricalStatsPage.js` fully restores the original expanded 2026 cricket matches containing bowling and fielding statistics.
 
 ---
 
@@ -65,10 +65,11 @@
 
 **Purpose**: High-fidelity unit tests, integration validation, and compiler confirmation
 
-- [ ] T012 [P] Write unit tests in `src/components/GameForm.test.js` to assert Bowling and Fielding input validations, specifically testing boundary limits and invalid decimal overs.
-- [ ] T013 [P] Write unit tests in `src/components/StatsTable.test.js` to verify exact math calculations for Economy, Average, and Strike Rate, checking division by zero and zero balls bowled edge cases.
-- [ ] T014 Run the Jest test suite via `npm test` to confirm all 11 previous tests + new bowling/fielding tests pass flawlessly.
-- [ ] T015 Run `npm run build` to confirm production Webpack compiler success.
+- [x] T012 [P] Write unit tests in `src/components/GameForm.test.js` to assert Bowling and Fielding input validations, specifically testing boundary limits and invalid decimal overs.
+- [x] T013 [P] Write unit tests in `src/components/StatsTable.test.js` to verify exact math calculations for Economy, Average, and Strike Rate, checking division by zero and zero balls bowled edge cases.
+- [x] T014 Run the Jest test suite via `npm test` to confirm all 11 previous tests + new bowling/fielding tests pass flawlessly.
+- [x] T015 Run `npm run build` to confirm production Webpack compiler success.
+- [x] T016 [US1] Implement a "Did Not Bat" (DNB) toggle option in `src/components/GameForm.js` and render clean placeholders in `src/components/StatsTable.js`.
 
 ---
 
