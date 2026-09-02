@@ -20,6 +20,8 @@ const DISMISSAL_METHODS = [
   'None',
   'Bowled',
   'Caught',
+  'Caught by Keeper',
+  'Caught & Bowled',
   'LBW',
   'Run Out',
   'Stumped',
