@@ -15,6 +15,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import AnalyticsIcon from '@mui/icons-material/BarChart';
 import StatsTable from '../components/StatsTable';
 import { initialMockGames } from '../data/mockData';
 
@@ -52,7 +53,7 @@ function HistoricalStatsPage() {
           Back to Home
         </Button>
 
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
           <Button
             variant="outlined"
             color="warning"
@@ -61,6 +62,15 @@ function HistoricalStatsPage() {
             sx={{ borderRadius: 2 }}
           >
             Reset Mock Data
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<AnalyticsIcon />}
+            onClick={() => navigate('/analytics')}
+            sx={{ borderRadius: 2, color: 'background.default', fontWeight: 'bold' }}
+          >
+            View Analytics
           </Button>
           <Button
             variant="contained"

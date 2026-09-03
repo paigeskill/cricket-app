@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import EnterGamePage from './pages/EnterGamePage';
 import HistoricalStatsPage from './pages/HistoricalStatsPage';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
 
 // Beautiful and sleek dark theme
 const theme = createTheme({
@@ -69,6 +70,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/enter-game" element={<EnterGamePage />} />
             <Route path="/historical-stats" element={<HistoricalStatsPage />} />
+            <Route path="/analytics" element={<AnalyticsDashboard />} />
           </Routes>
         </Layout>
       </Router>

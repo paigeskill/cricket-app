@@ -18,3 +18,7 @@ jest.mock('@mui/icons-material/ArrowBack', () => () => <span data-testid="ArrowB
 jest.mock('@mui/icons-material/Refresh', () => () => <span data-testid="RefreshIcon" />, { virtual: true });
 jest.mock('@mui/icons-material/Save', () => () => <span data-testid="SaveIcon" />, { virtual: true });
 jest.mock('@mui/icons-material/DeleteOutlined', () => () => <span data-testid="DeleteOutlinedIcon" />, { virtual: true });
+jest.mock('@mui/icons-material/BarChart', () => () => <span data-testid="BarChartIcon" />, { virtual: true });
+jest.mock('@mui/icons-material/FilterAltOff', () => () => <span data-testid="FilterAltOffIcon" />, { virtual: true });
+jest.mock('@mui/icons-material/TableRows', () => () => <span data-testid="TableRowsIcon" />, { virtual: true });
+jest.mock('@mui/icons-material/QueryStats', () => () => <span data-testid="QueryStatsIcon" />, { virtual: true });

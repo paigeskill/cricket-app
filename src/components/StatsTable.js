@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Chip,
   Typography,
   Box,
@@ -14,10 +7,14 @@ import {
   CardContent,
   Grid,
   Tabs,
-  Tab
+  Tab,
+  TableCell,
+  TableRow
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import CricketTable from './CricketTable';
+import GameRowCells from './GameRowCells';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -118,6 +115,27 @@ function StatsTable({ games }) {
 
     return { economy, average, strikeRate };
   };
+
+  // Header Definition Arrays
+  const battingHeaders = [
+    { text: 'Date' }, { text: 'Club' }, { text: 'Opponent' }, { text: 'Venue' },
+    { text: 'Runs', align: 'right' }, { text: 'Position', align: 'right' },
+    { text: 'Status' }, { text: 'Dismissal' }
+  ];
+
+  const bowlingHeaders = [
+    { text: 'Date' }, { text: 'Club' }, { text: 'Opponent' }, { text: 'Venue' },
+    { text: 'Overs', align: 'right' }, { text: 'Maidens', align: 'right' },
+    { text: 'Runs', align: 'right' }, { text: 'Wickets', align: 'right' },
+    { text: 'Economy', align: 'right' }, { text: 'Average', align: 'right' },
+    { text: 'SR', align: 'right' }
+  ];
+
+  const fieldingHeaders = [
+    { text: 'Date' }, { text: 'Club' }, { text: 'Opponent' }, { text: 'Venue' },
+    { text: 'Catches', align: 'right' }, { text: 'Run Outs', align: 'right' },
+    { text: 'Stumpings', align: 'right' }, { text: 'Byes Conceded', align: 'right' }
+  ];
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -299,190 +317,91 @@ function StatsTable({ games }) {
 
       {/* Batting Scorecard Tab */}
       <TabPanel value={activeTab} index={0}>
-        <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-          <Table sx={{ minWidth: 650 }} aria-label="cricket batting table">
-            <TableHead sx={{ bgcolor: 'primary.dark' }}>
-              <TableRow>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Date</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Club</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Opponent</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Venue</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Runs</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Position</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Dismissal</TableCell>
+        <CricketTable
+          headerColor="primary.dark"
+          headers={battingHeaders}
+          isEmpty={games.length === 0}
+        >
+          {games.map((game) => {
+            const isDnb = game.did_not_bat || game.runs_scored === null;
+            return (
+              <TableRow
+                key={game.id}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+              >
+                <GameRowCells game={game} />
+                <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+                  {isDnb ? 'DNB' : `${game.runs_scored}${!game.is_out ? '*' : ''}`}
+                </TableCell>
+                <TableCell align="right">{isDnb ? '—' : game.batting_number}</TableCell>
+                <TableCell>
+                  {isDnb ? (
+                    <Chip label="DNB" size="small" color="default" variant="outlined" />
+                  ) : game.is_out ? (
+                    <Chip icon={<CancelOutlinedIcon />} label="Out" size="small" color="error" variant="outlined" />
+                  ) : (
+                    <Chip icon={<CheckCircleOutlineIcon />} label="Not Out" size="small" color="success" variant="outlined" />
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" sx={{ fontStyle: (isDnb || game.dismissal === 'None') ? 'italic' : 'normal', color: (isDnb || game.dismissal === 'None') ? 'text.secondary' : 'text.primary' }}>
+                    {isDnb ? '—' : game.dismissal}
+                  </Typography>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {games.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      No game records found. Click "Enter New Game" to add one!
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                games.map((game) => {
-                  const isDnb = game.did_not_bat || game.runs_scored === null;
-                  return (
-                    <TableRow
-                      key={game.id}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
-                    >
-                      <TableCell component="th" scope="row">{game.date}</TableCell>
-                      <TableCell>{game.club}</TableCell>
-                      <TableCell>{game.opponent}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={game.location} 
-                          size="small" 
-                          color={game.location === 'Home' ? 'primary' : 'default'}
-                          variant={game.location === 'Home' ? 'filled' : 'outlined'}
-                        />
-                      </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-                        {isDnb ? 'DNB' : `${game.runs_scored}${!game.is_out ? '*' : ''}`}
-                      </TableCell>
-                      <TableCell align="right">{isDnb ? '—' : game.batting_number}</TableCell>
-                      <TableCell>
-                        {isDnb ? (
-                          <Chip label="DNB" size="small" color="default" variant="outlined" />
-                        ) : game.is_out ? (
-                          <Chip icon={<CancelOutlinedIcon />} label="Out" size="small" color="error" variant="outlined" />
-                        ) : (
-                          <Chip icon={<CheckCircleOutlineIcon />} label="Not Out" size="small" color="success" variant="outlined" />
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontStyle: (isDnb || game.dismissal === 'None') ? 'italic' : 'normal', color: (isDnb || game.dismissal === 'None') ? 'text.secondary' : 'text.primary' }}>
-                          {isDnb ? '—' : game.dismissal}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            );
+          })}
+        </CricketTable>
       </TabPanel>
 
       {/* Bowling Scorecard Tab */}
       <TabPanel value={activeTab} index={1}>
-        <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-          <Table sx={{ minWidth: 650 }} aria-label="cricket bowling table">
-            <TableHead sx={{ bgcolor: 'secondary.dark' }}>
-              <TableRow>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Date</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Club</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Opponent</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Venue</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Overs</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Maidens</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Runs</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Wickets</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Economy</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Average</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>SR</TableCell>
+        <CricketTable
+          headerColor="secondary.dark"
+          headers={bowlingHeaders}
+          isEmpty={games.length === 0}
+        >
+          {games.map((game) => {
+            const stats = getBowlingRowStats(game);
+            return (
+              <TableRow
+                key={game.id}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+              >
+                <GameRowCells game={game} />
+                <TableCell align="right">{(game.overs_bowled || 0).toFixed(1)}</TableCell>
+                <TableCell align="right">{game.maidens_bowled || 0}</TableCell>
+                <TableCell align="right">{game.runs_conceded || 0}</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 'bold', color: 'primary.light' }}>{game.wickets_taken || 0}</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 'bold' }}>{stats.economy}</TableCell>
+                <TableCell align="right">{stats.average}</TableCell>
+                <TableCell align="right">{stats.strikeRate}</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {games.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={11} align="center" sx={{ py: 6 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      No game records found. Click "Enter New Game" to add one!
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                games.map((game) => {
-                  const stats = getBowlingRowStats(game);
-                  return (
-                    <TableRow
-                      key={game.id}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
-                    >
-                      <TableCell component="th" scope="row">{game.date}</TableCell>
-                      <TableCell>{game.club}</TableCell>
-                      <TableCell>{game.opponent}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={game.location} 
-                          size="small" 
-                          color={game.location === 'Home' ? 'primary' : 'default'}
-                          variant={game.location === 'Home' ? 'filled' : 'outlined'}
-                        />
-                      </TableCell>
-                      <TableCell align="right">{(game.overs_bowled || 0).toFixed(1)}</TableCell>
-                      <TableCell align="right">{game.maidens_bowled || 0}</TableCell>
-                      <TableCell align="right">{game.runs_conceded || 0}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold', color: 'primary.light' }}>{game.wickets_taken || 0}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 'bold' }}>{stats.economy}</TableCell>
-                      <TableCell align="right">{stats.average}</TableCell>
-                      <TableCell align="right">{stats.strikeRate}</TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            );
+          })}
+        </CricketTable>
       </TabPanel>
 
       {/* Fielding Scorecard Tab */}
       <TabPanel value={activeTab} index={2}>
-        <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-          <Table sx={{ minWidth: 650 }} aria-label="cricket fielding table">
-            <TableHead sx={{ bgcolor: 'warning.dark' }}>
-              <TableRow>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Date</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Club</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Opponent</TableCell>
-                <TableCell sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Venue</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Catches</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Run Outs</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Stumpings</TableCell>
-                <TableCell align="right" sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}>Byes Conceded</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {games.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      No game records found. Click "Enter New Game" to add one!
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                games.map((game) => (
-                  <TableRow
-                    key={game.id}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
-                  >
-                    <TableCell component="th" scope="row">{game.date}</TableCell>
-                    <TableCell>{game.club}</TableCell>
-                    <TableCell>{game.opponent}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={game.location} 
-                        size="small" 
-                        color={game.location === 'Home' ? 'primary' : 'default'}
-                        variant={game.location === 'Home' ? 'filled' : 'outlined'}
-                      />
-                    </TableCell>
-                    <TableCell align="right" sx={{ fontWeight: (game.catches || 0) > 0 ? 'bold' : 'normal' }}>{game.catches || 0}</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: (game.run_outs || 0) > 0 ? 'bold' : 'normal' }}>{game.run_outs || 0}</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: (game.stumpings || 0) > 0 ? 'bold' : 'normal' }}>{game.stumpings || 0}</TableCell>
-                    <TableCell align="right">{game.byes_conceded || 0}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <CricketTable
+          headerColor="warning.dark"
+          headers={fieldingHeaders}
+          isEmpty={games.length === 0}
+        >
+          {games.map((game) => (
+            <TableRow
+              key={game.id}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+            >
+              <GameRowCells game={game} />
+              <TableCell align="right" sx={{ fontWeight: (game.catches || 0) > 0 ? 'bold' : 'normal' }}>{game.catches || 0}</TableCell>
+              <TableCell align="right" sx={{ fontWeight: (game.run_outs || 0) > 0 ? 'bold' : 'normal' }}>{game.run_outs || 0}</TableCell>
+              <TableCell align="right" sx={{ fontWeight: (game.stumpings || 0) > 0 ? 'bold' : 'normal' }}>{game.stumpings || 0}</TableCell>
+              <TableCell align="right">{game.byes_conceded || 0}</TableCell>
+            </TableRow>
+          ))}
+        </CricketTable>
       </TabPanel>
     </Box>
   );

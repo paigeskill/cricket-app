@@ -18,7 +18,7 @@
 
 **Purpose**: Register routes and sidebar navigation elements
 
-- [ ] T001 Configure router paths in `src/App.js` to render the newly created `/analytics` dashboard page, and add a responsive link labeled "Analytics Dashboard" pointing to it inside the sidebar navigation drawer of `src/components/Layout.js`.
+- [x] T001 Configure router paths in `src/App.js` to render the newly created `/analytics` dashboard page, and add a responsive link labeled "Analytics Dashboard" pointing to it inside the sidebar navigation drawer of `src/components/Layout.js`.
 
 ---
 
@@ -26,7 +26,7 @@
 
 **Purpose**: Core math computations and grouping helpers
 
-- [ ] T002 Implement a core analytical calculation utility file in `src/utils/analyticsHelper.js` to parse flat game records, compute aggregates (Total Runs, Innings, Average, Runs per Dismissal, Total Wickets, Best Bowling, Catches, Run Outs, Stumpings), group datasets dynamically by Year/Month/Club, and provide division-by-zero protection.
+- [x] T002 Implement a core analytical calculation utility file in `src/utils/analyticsHelper.js` to parse flat game records, compute aggregates (Total Runs, Innings, Average, Runs per Dismissal, Total Wickets, Best Bowling, Catches, Run Outs, Stumpings), group datasets dynamically by Year/Month/Club, and provide division-by-zero protection.
 
 ---
 
@@ -38,9 +38,9 @@
 
 ### Implementation for User Story 1 & 2
 
-- [ ] T003 [P] [US3] Create the filter bar component in `src/components/AnalyticsFilters.js` featuring multiselect select dropdowns for Year and Club, alongside Location/Venue toggle buttons.
-- [ ] T004 [P] [US1] Create the core dashboard container `src/pages/AnalyticsDashboard.js` managing selected filter states, triggering groupings dynamically by Year/Month/Club, and rendering the tabular "Runs & Averages" panel.
-- [ ] T005 [P] [US2] Implement the tabular dismissal breakdown scorecard inside `src/pages/AnalyticsDashboard.js` showing categorized wickets lost counts.
+- [x] T003 [P] [US3] Create the filter bar component in `src/components/AnalyticsFilters.js` featuring multiselect select dropdowns for Year and Club, alongside Location/Venue toggle buttons.
+- [x] T004 [P] [US1] Create the core dashboard container `src/pages/AnalyticsDashboard.js` managing selected filter states, triggering groupings dynamically by Year/Month/Club, and rendering the tabular "Runs & Averages" panel.
+- [x] T005 [P] [US2] Implement the tabular dismissal breakdown scorecard inside `src/pages/AnalyticsDashboard.js` showing categorized wickets lost counts.
 
 ---
 
@@ -52,9 +52,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T006 [P] [US4] Create a custom SVG Line and Bar chart renderer component in `src/components/CustomCharts.js` supporting dynamic scale coordinate mappings and hover mouse overlay events.
-- [ ] T007 [P] [US4] Create a custom SVG Donut chart renderer component in `src/components/CustomCharts.js` calculating polar arc slices to represent dismissal percentage distributions.
-- [ ] T008 [US4] Integrate the charts inside `src/pages/AnalyticsDashboard.js` with toggle controls to switch each scorecard panel between "Data Table" and "Visual Graph" views.
+- [x] T006 [P] [US4] Create a custom SVG Line and Bar chart renderer component in `src/components/CustomCharts.js` supporting dynamic scale coordinate mappings and hover mouse overlay events.
+- [x] T007 [P] [US4] Create a custom SVG Donut chart renderer component in `src/components/CustomCharts.js` calculating polar arc slices to represent dismissal percentage distributions.
+- [x] T008 [US4] Integrate the charts inside `src/pages/AnalyticsDashboard.js` with toggle controls to switch each scorecard panel between "Data Table" and "Visual Graph" views.
 
 ---
 
@@ -64,7 +64,7 @@
 
 ### Implementation for User Story 3 & 5
 
-- [ ] T009 [US3] Create the comparative side-by-side analysis dashboard tab inside `src/pages/AnalyticsDashboard.js` featuring parallel KPI metric cards and a dual-bar comparative SVG chart.
+- [x] T009 [US3] Create the comparative side-by-side analysis dashboard tab inside `src/pages/AnalyticsDashboard.js` featuring parallel KPI metric cards and a dual-bar comparative SVG chart.
 
 ---
 
@@ -72,10 +72,13 @@
 
 **Purpose**: High-fidelity unit tests, integration validation, and compiler confirmation
 
-- [ ] T010 [P] Write unit tests in `src/utils/analyticsHelper.test.js` validating the calculations, grouping logic, and null batting / DNB exclusions.
-- [ ] T011 [P] Write unit tests in `src/pages/AnalyticsDashboard.test.js` to verify filtering dropdown triggers, tab switches, and Table vs Graph toggling.
-- [ ] T012 Run the Jest test suite via `npm test` to confirm all 14 previous tests + new analytics tests pass flawlessly.
-- [ ] T013 Run `npm run build` to confirm production Webpack compiler success.
+- [x] T010 [P] Write unit tests in `src/utils/analyticsHelper.test.js` validating the calculations, grouping logic, and null batting / DNB exclusions.
+- [x] T011 [P] Write unit tests in `src/pages/AnalyticsDashboard.test.js` to verify filtering dropdown triggers, tab switches, and Table vs Graph toggling.
+- [x] T012 Run the Jest test suite via `npm test` to confirm all 14 previous tests + new analytics tests pass flawlessly.
+- [x] T013 Run `npm run build` to confirm production Webpack compiler success.
+- [x] T014 [US3] Add a responsive "View Analytics" button in the actions header of `src/pages/HistoricalStatsPage.js` to link up scorecard data with the Advanced Analytics Dashboard page.
+- [x] T015 [US3] Optimize Year and Club filters in `src/components/AnalyticsFilters.js` to render a compact selected count summary and display active selections as deletable MUI Chips underneath.
+- [x] T016 [US2] Implement dynamic "Group By" and specific group selections in the Dismissal Breakdown tab of `src/pages/AnalyticsDashboard.js` to analyze dismissal types per year, month, club, or venue.
 
 ---
 

@@ -19,6 +19,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import HistoryIcon from '@mui/icons-material/History';
+import AnalyticsIcon from '@mui/icons-material/BarChart';
 
 function Layout({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -35,7 +36,8 @@ function Layout({ children }) {
   const navItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Enter New Game', icon: <AddCircleOutlinedIcon />, path: '/enter-game' },
-    { text: 'View Historical Stats', icon: <HistoryIcon />, path: '/historical-stats' }
+    { text: 'View Historical Stats', icon: <HistoryIcon />, path: '/historical-stats' },
+    { text: 'Analytics Dashboard', icon: <AnalyticsIcon />, path: '/analytics' }
   ];
 
   const handleNavigation = (path) => {
