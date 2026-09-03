@@ -5,26 +5,28 @@ import {
   Typography,
   Button,
   Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions
+  Snackbar,
+  Alert
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AnalyticsIcon from '@mui/icons-material/BarChart';
 import StatsTable from '../components/StatsTable';
 import EditGameDialog from '../components/EditGameDialog';
 import { initialMockGames } from '../data/mockData';
+import { parseCSV } from '../utils/csvParserHelper';
 
 function HistoricalStatsPage() {
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
-  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [selectedGameToEdit, setSelectedGameToEdit] = useState(null);
   const [defaultFormTab, setDefaultFormTab] = useState(0);
+
+  // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   // Load games from localStorage or fallback to default mock data
   useEffect(() => {
@@ -37,12 +39,6 @@ function HistoricalStatsPage() {
     }
   }, []);
 
-  const handleResetData = () => {
-    localStorage.setItem('cricket_games', JSON.stringify(initialMockGames));
-    setGames(initialMockGames);
-    setResetDialogOpen(false);
-  };
-
   const handleUpdateGame = (updatedGame) => {
     const updatedGames = games.map(g => g.id === updatedGame.id ? updatedGame : g);
     localStorage.setItem('cricket_games', JSON.stringify(updatedGames));
@@ -50,9 +46,52 @@ function HistoricalStatsPage() {
     setSelectedGameToEdit(null);
   };
 
+  const handleDeleteGame = (gameId) => {
+    const updatedGames = games.filter(g => g.id !== gameId);
+    localStorage.setItem('cricket_games', JSON.stringify(updatedGames));
+    setGames(updatedGames);
+    setSelectedGameToEdit(null);
+    setSnackbarSeverity('success');
+    setSnackbarMessage('Game record successfully deleted.');
+    setSnackbarOpen(true);
+  };
+
   const handleEditClick = (game, defaultTab) => {
     setSelectedGameToEdit(game);
     setDefaultFormTab(defaultTab || 0);
+  };
+
+  const handleImportCSV = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const parsedGames = parseCSV(text);
+        if (parsedGames.length === 0) {
+          throw new Error('No games parsed or invalid file structure');
+        }
+        localStorage.setItem('cricket_games', JSON.stringify(parsedGames));
+        setGames(parsedGames);
+        setSnackbarSeverity('success');
+        setSnackbarMessage(`Successfully imported ${parsedGames.length} matches!`);
+        setSnackbarOpen(true);
+      } catch (err) {
+        setSnackbarSeverity('error');
+        setSnackbarMessage(`Error importing CSV: ${err.message || 'Invalid column headers or file format. Please check your template.'}`);
+        setSnackbarOpen(true);
+      }
+    };
+    reader.onerror = () => {
+      setSnackbarSeverity('error');
+      setSnackbarMessage('Error reading file.');
+      setSnackbarOpen(true);
+    };
+    reader.readAsText(file);
+    // Reset file input value to allow uploading same file again
+    event.target.value = '';
   };
 
   return (
@@ -70,12 +109,19 @@ function HistoricalStatsPage() {
         <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
           <Button
             variant="outlined"
-            color="warning"
-            startIcon={<RefreshIcon />}
-            onClick={() => setResetDialogOpen(true)}
-            sx={{ borderRadius: 2 }}
+            color="info"
+            component="label"
+            startIcon={<CloudUploadIcon />}
+            sx={{ borderRadius: 2, borderWidth: 2, '&:hover': { borderWidth: 2 } }}
           >
-            Reset Mock Data
+            Import Data
+            <input
+              type="file"
+              accept=".csv"
+              hidden
+              onChange={handleImportCSV}
+              data-testid="csv-file-input"
+            />
           </Button>
           <Button
             variant="contained"
@@ -108,31 +154,6 @@ function HistoricalStatsPage() {
 
       <StatsTable games={games} onEditGame={handleEditClick} />
 
-      {/* Reset Confirmation Dialog */}
-      <Dialog
-        open={resetDialogOpen}
-        onClose={() => setResetDialogOpen(false)}
-        aria-labelledby="reset-dialog-title"
-        aria-describedby="reset-dialog-description"
-      >
-        <DialogTitle id="reset-dialog-title">
-          {"Reset statistics to original mock data?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="reset-dialog-description">
-            This action will clear all newly added game records and restore the default 2026 cricket matches. This cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ p: 2, pt: 0 }}>
-          <Button onClick={() => setResetDialogOpen(false)} color="inherit">
-            Cancel
-          </Button>
-          <Button onClick={handleResetData} color="warning" variant="contained" autoFocus>
-            Confirm Reset
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Reusable Edit Game Modal Component */}
       <EditGameDialog
         open={!!selectedGameToEdit}
@@ -140,7 +161,20 @@ function HistoricalStatsPage() {
         game={selectedGameToEdit}
         defaultTab={defaultFormTab}
         onSave={handleUpdateGame}
+        onDelete={handleDeleteGame}
       />
+
+      {/* Toast Feedback */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} variant="filled" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

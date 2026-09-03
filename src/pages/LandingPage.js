@@ -33,7 +33,7 @@ function LandingPage() {
       {/* Main Call to Actions */}
       <Grid container spacing={4} sx={{ justifyContent: 'center', alignItems: 'stretch', px: { xs: 2, md: 4 } }}>
         {/* Card 1: Enter Game */}
-        <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
+        <Grid xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
           <Card 
             className="hover-card"
             sx={{ 
@@ -71,7 +71,7 @@ function LandingPage() {
         </Grid>
 
         {/* Card 2: Historical Stats */}
-        <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
+        <Grid xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
           <Card 
             className="hover-card"
             sx={{ 
@@ -109,7 +109,7 @@ function LandingPage() {
         </Grid>
 
         {/* Card 3: Advanced Analytics */}
-        <Grid item xs={12} sm={12} md={4} sx={{ display: 'flex' }}>
+        <Grid xs={12} sm={12} md={4} sx={{ display: 'flex' }}>
           <Card 
             className="hover-card"
             sx={{ 

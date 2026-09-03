@@ -52,7 +52,7 @@ function AnalyticsFilters({
     <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'background.paper' }}>
       <Grid container spacing={3} sx={{ alignItems: 'center' }}>
         {/* Row 1: Select Dropdowns (Wider md=6 each) */}
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <FormControl fullWidth size="small">
             <InputLabel id="analytics-years-label">Filter Years</InputLabel>
             <Select
@@ -75,7 +75,7 @@ function AnalyticsFilters({
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <FormControl fullWidth size="small">
             <InputLabel id="analytics-clubs-label">Filter Clubs</InputLabel>
             <Select
@@ -99,7 +99,7 @@ function AnalyticsFilters({
         </Grid>
 
         {/* Row 2: Location and Reset Action */}
-        <Grid item xs={12} sm={8} md={9}>
+        <Grid xs={12} sm={8} md={9}>
           <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
               Home / Away
@@ -120,7 +120,7 @@ function AnalyticsFilters({
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={3}>
+        <Grid xs={12} sm={4} md={3}>
           <Box sx={{ display: 'flex', flexDirection: 'column', pt: 2.2 }}>
             <Button
               variant="outlined"
@@ -138,7 +138,7 @@ function AnalyticsFilters({
 
         {/* Chips row display underneath select inputs */}
         {(selectedYears.length > 0 || selectedClubs.length > 0) && (
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pt: 1, borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
               {selectedYears.map(year => (
                 <Chip

@@ -17,7 +17,7 @@ import GameForm from './GameForm';
  * @param {number} defaultTab - Tab index focus when the form mounts
  * @param {function} onSave - Submit save callback passing the updated game object
  */
-function EditGameDialog({ open, onClose, game, defaultTab, onSave }) {
+function EditGameDialog({ open, onClose, game, defaultTab, onSave, onDelete }) {
   return (
     <Dialog 
       open={open} 
@@ -46,6 +46,7 @@ function EditGameDialog({ open, onClose, game, defaultTab, onSave }) {
             initialData={game}
             defaultTab={defaultTab}
             onSave={onSave}
+            onDelete={onDelete}
           />
         )}
       </DialogContent>

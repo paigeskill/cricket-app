@@ -216,7 +216,7 @@ function AnalyticsDashboard() {
 
       {/* Quick Summary Card Grid */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
@@ -228,7 +228,7 @@ function AnalyticsDashboard() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
@@ -240,7 +240,7 @@ function AnalyticsDashboard() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
@@ -252,7 +252,7 @@ function AnalyticsDashboard() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
@@ -327,13 +327,13 @@ function AnalyticsDashboard() {
         ) : (
           <Paper elevation={3} sx={{ p: 4, borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'background.paper' }}>
             <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.light', mb: 2, textAlign: 'center' }}>
                   Total Runs Scored Trend ({groupBy})
                 </Typography>
                 <RunsTrendLineChart data={groupedStats} />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', color: 'secondary.main', mb: 2, textAlign: 'center' }}>
                   Averages vs Runs / Dismissal ({groupBy})
                 </Typography>
@@ -470,25 +470,25 @@ function AnalyticsDashboard() {
             {statItemA && statItemB && (
               <Grid container spacing={4} sx={{ mb: 4 }}>
                 {/* Column A */}
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <Paper elevation={3} sx={{ p: 3, borderRadius: 3, border: '1px solid #bb86fc', bgcolor: 'rgba(187, 134, 252, 0.02)' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
                       {statItemA.key} Summary
                     </Typography>
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Total Runs</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.totalRuns}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Innings</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.inningsBatted}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Batting Average</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.battingAverage}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Runs / Dismissal</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.runsPerDismissal}</Typography>
                       </Grid>
@@ -497,25 +497,25 @@ function AnalyticsDashboard() {
                 </Grid>
 
                 {/* Column B */}
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <Paper elevation={3} sx={{ p: 3, borderRadius: 3, border: '1px solid #03dac6', bgcolor: 'rgba(3, 218, 198, 0.02)' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: 'secondary.main' }}>
                       {statItemB.key} Summary
                     </Typography>
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Total Runs</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.totalRuns}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Innings</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.inningsBatted}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Batting Average</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.battingAverage}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Runs / Dismissal</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.runsPerDismissal}</Typography>
                       </Grid>

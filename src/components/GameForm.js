@@ -17,6 +17,7 @@ import {
   Tab
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
 const DISMISSAL_METHODS = [
   'None',
@@ -52,7 +53,7 @@ function TabPanel(props) {
   );
 }
 
-function GameForm({ onSave, initialData, defaultTab }) {
+function GameForm({ onSave, initialData, defaultTab, onDelete }) {
   const [tabIndex, setTabIndex] = useState(defaultTab || 0);
 
   useEffect(() => {
@@ -592,17 +593,35 @@ function GameForm({ onSave, initialData, defaultTab }) {
           </Stack>
         </TabPanel>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
-          startIcon={<SaveIcon />}
-          sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', mt: 4 }}
-          fullWidth
-        >
-          Save Game Details
-        </Button>
+        <Stack direction="row" spacing={2} sx={{ mt: 4 }}>
+          {initialData && initialData.id && onDelete && (
+            <Button
+              variant="outlined"
+              color="error"
+              size="large"
+              startIcon={<DeleteOutlinedIcon />}
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete this game record? This cannot be undone.')) {
+                  onDelete(initialData.id);
+                }
+              }}
+              sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', flex: 1 }}
+            >
+              Delete Game
+            </Button>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large"
+            startIcon={<SaveIcon />}
+            sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', flex: initialData && initialData.id && onDelete ? 1 : 'none' }}
+            fullWidth={!(initialData && initialData.id && onDelete)}
+          >
+            Save Game Details
+          </Button>
+        </Stack>
       </Box>
     </Paper>
   );

@@ -34,7 +34,7 @@ describe('HistoricalStatsPage', () => {
     return render(<Router>{children}</Router>);
   };
 
-  test('renders page elements, resets mock confirmation overlays, and opens edit dialogs correctly', async () => {
+  test('renders page elements, action buttons, and handles edit triggers correctly', async () => {
     renderWithRouter(<HistoricalStatsPage />);
 
     // Verify headers exist
@@ -42,28 +42,12 @@ describe('HistoricalStatsPage', () => {
     expect(screen.getByText(/This page displays a dashboard/i)).toBeInTheDocument();
 
     // Verify action header buttons exist
-    expect(screen.getByRole('button', { name: /Reset Mock Data/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Import Data/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /View Analytics/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add New Game/i })).toBeInTheDocument();
 
     // Verify StatsTable mounts
     expect(screen.getByTestId('mock-stats-table')).toBeInTheDocument();
-
-    // Trigger "Reset Mock Data" dialog
-    const resetButton = screen.getByRole('button', { name: /Reset Mock Data/i });
-    fireEvent.click(resetButton);
-
-    // Verify reset dialog overlay is visible
-    expect(screen.getByText('Reset statistics to original mock data?')).toBeInTheDocument();
-
-    // Cancel reset dialog
-    const cancelButton = screen.getByRole('button', { name: /Cancel/i });
-    fireEvent.click(cancelButton);
-
-    // Verify reset dialog is closed
-    await waitFor(() => {
-      expect(screen.queryByText('Reset statistics to original mock data?')).not.toBeInTheDocument();
-    });
 
     // Trigger edit modal via simulated Edit button in mock StatsTable
     const editButton = screen.getByRole('button', { name: /Edit Game/i });
@@ -80,6 +64,47 @@ describe('HistoricalStatsPage', () => {
     // Verify Dialog is closed
     await waitFor(() => {
       expect(screen.queryByTestId('mock-edit-dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  test('allows uploading a CSV file and parsing it', async () => {
+    renderWithRouter(<HistoricalStatsPage />);
+
+    // Find the file input
+    const fileInput = screen.getByTestId('csv-file-input');
+
+    // Create a mock file
+    const file = new File([
+      'Club,Team,Opponent,Date,Year,Month,H / A,Overs,Maidens,Runs,Wickets,Number,Runs,Dismissal,Out?,Catches,Run Outs,Stumpings,Byes\n' +
+      'NCC,3s,Pontblyddyn,5/4/2014,2014,MAY,A,4,3,7,1,8,25,CWK,1,1,0,N/A,N/A'
+    ], 'stats.csv', { type: 'text/csv' });
+
+    // Trigger the file upload
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    // Wait for the snackbar to appear
+    await waitFor(() => {
+      expect(screen.getByText(/Successfully imported 1 matches!/i)).toBeInTheDocument();
+    });
+  });
+
+  test('shows error when uploading an invalid/empty file', async () => {
+    renderWithRouter(<HistoricalStatsPage />);
+
+    // Find the file input
+    const fileInput = screen.getByTestId('csv-file-input');
+
+    // Create a mock file
+    const file = new File([
+      ''
+    ], 'empty.csv', { type: 'text/csv' });
+
+    // Trigger the file upload
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    // Wait for the error snackbar to appear
+    await waitFor(() => {
+      expect(screen.getByText(/Error importing CSV:/i)).toBeInTheDocument();
     });
   });
 });

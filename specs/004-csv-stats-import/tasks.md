@@ -20,7 +20,7 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create custom CSV helper placeholder file in `src/utils/csvParserHelper.js`
+- [x] T001 Create custom CSV helper placeholder file in `src/utils/csvParserHelper.js`
 
 ---
 
@@ -30,7 +30,7 @@
 
 **⚠️ CRITICAL**: No UI integration work can begin until this phase is complete
 
-- [ ] T002 Initialize the unit test suite file in `src/utils/csvParserHelper.test.js` containing empty/dummy tests to verify Jest can run it
+- [x] T002 Initialize the unit test suite file in `src/utils/csvParserHelper.test.js` containing empty/dummy tests to verify Jest can run it
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -43,10 +43,10 @@
 **Independent Test**: Verify that clicking the "Import Data" button opens the file selector and lets the user choose a CSV file.
 
 ### Tests for User Story 1
-- [ ] T003 [P] [US1] Create unit tests in `src/pages/HistoricalStatsPage.test.js` to ensure the new "Import Data" button is successfully rendered in the header and triggers a file input click
+- [x] T003 [P] [US1] Create unit tests in `src/pages/HistoricalStatsPage.test.js` to ensure the new "Import Data" button is successfully rendered in the header and triggers a file input click
 
 ### Implementation for User Story 1
-- [ ] T004 [US1] Replace the "Reset Mock Data" button in `src/pages/HistoricalStatsPage.js` with an "Import Data" button using matching styles, custom `CloudUploadIcon`, and a hidden `<input type="file" accept=".csv" />`
+- [x] T004 [US1] Replace the "Reset Mock Data" button in `src/pages/HistoricalStatsPage.js` with an "Import Data" button using matching styles, custom `CloudUploadIcon`, and a hidden `<input type="file" accept=".csv" />`
 
 **Checkpoint**: User Story 1 is fully functional and testable independently
 
@@ -59,11 +59,11 @@
 **Independent Test**: Run unit tests on `src/utils/csvParserHelper.js` with sample rows to prove correct tokenization (even with commas inside quoted cells) and correct acronym translation.
 
 ### Tests for User Story 2
-- [ ] T005 [P] [US2] Write unit tests in `src/utils/csvParserHelper.test.js` validating that individual CSV rows parse correctly, and dismissal abbreviations map to descriptive strings
+- [x] T005 [P] [US2] Write unit tests in `src/utils/csvParserHelper.test.js` validating that individual CSV rows parse correctly, and dismissal abbreviations map to descriptive strings
 
 ### Implementation for User Story 2
-- [ ] T006 [P] [US2] Implement the row-splitting and tokenization logic in `src/utils/csvParserHelper.js` using regular expressions that preserve commas wrapped in double quotes
-- [ ] T007 [P] [US2] Implement the `DISMISSAL_DICTIONARY` mapping in `src/utils/csvParserHelper.js` to translate acronyms to readable names, setting `is_out` accordingly
+- [x] T006 [P] [US2] Implement the row-splitting and tokenization logic in `src/utils/csvParserHelper.js` using regular expressions that preserve commas wrapped in double quotes
+- [x] T007 [P] [US2] Implement the `DISMISSAL_DICTIONARY` mapping in `src/utils/csvParserHelper.js` to translate acronyms to readable names, setting `is_out` accordingly
 
 **Checkpoint**: User Story 2 is fully functional and testable independently
 
@@ -76,12 +76,12 @@
 **Independent Test**: Run unit tests on `src/utils/csvParserHelper.js` ensuring wicketkeeper vs outfield routing works correctly and `N/A` fields do not crash parsing or skew data.
 
 ### Tests for User Story 3
-- [ ] T008 [P] [US3] Add unit tests in `src/utils/csvParserHelper.test.js` to verify keeper-specific fields routing, `did_not_bat` evaluation when Runs is `"N/A"`, and graceful parsing of numeric `"N/A"` cells
+- [x] T008 [P] [US3] Add unit tests in `src/utils/csvParserHelper.test.js` to verify keeper-specific fields routing, `did_not_bat` evaluation when Runs is `"N/A"`, and graceful parsing of numeric `"N/A"` cells
 
 ### Implementation for User Story 3
-- [ ] T009 [P] [US3] Implement batting `"N/A"` handling in `src/utils/csvParserHelper.js` to explicitly set `did_not_bat: true` on the record when Runs is `"N/A"`
-- [ ] T010 [P] [US3] Implement bowling and fielding `"N/A"` nullification in `src/utils/csvParserHelper.js` to store missing stats as `null` and prevent them from skewing rates
-- [ ] T011 [P] [US3] Implement dynamic wicketkeeping checks in `src/utils/csvParserHelper.js` to set `is_keeper: true` and map catches/runouts to keeper fields if stumpings/byes are present and not `"N/A"`, mapping them to outfield fields otherwise
+- [x] T009 [P] [US3] Implement batting `"N/A"` handling in `src/utils/csvParserHelper.js` to explicitly set `did_not_bat: true` on the record when Runs is `"N/A"`
+- [x] T010 [P] [US3] Implement bowling and fielding `"N/A"` nullification in `src/utils/csvParserHelper.js` to store missing stats as `null` and prevent them from skewing rates
+- [x] T011 [P] [US3] Implement dynamic wicketkeeping checks in `src/utils/csvParserHelper.js` to set `is_keeper: true` and map catches/runouts to keeper fields if stumpings/byes are present and not `"N/A"`, mapping them to outfield fields otherwise
 
 **Checkpoint**: User Story 3 is fully functional and testable independently
 
@@ -94,11 +94,11 @@
 **Independent Test**: Load a CSV, confirm the "Successfully imported X matches!" snackbar alert shows, and verify the UI updates immediately with the imported data.
 
 ### Tests for User Story 4
-- [ ] T012 [P] [US4] Add unit tests in `src/pages/HistoricalStatsPage.test.js` verifying successful file reading, state modification, snackbar alerts on import, and local storage replacement
+- [x] T012 [P] [US4] Add unit tests in `src/pages/HistoricalStatsPage.test.js` verifying successful file reading, state modification, snackbar alerts on import, and local storage replacement
 
 ### Implementation for User Story 4
-- [ ] T013 [US4] Integrate `src/utils/csvParserHelper.js` inside `src/pages/HistoricalStatsPage.js` to handle file selection, parse the string content, and save the resultant JSON array to `localStorage` under `cricket_games`
-- [ ] T014 [US4] Remove the old confirmation dialog, reset mock data button code, and associated mock data reset handlers from `src/pages/HistoricalStatsPage.js`
+- [x] T013 [US4] Integrate `src/utils/csvParserHelper.js` inside `src/pages/HistoricalStatsPage.js` to handle file selection, parse the string content, and save the resultant JSON array to `localStorage` under `cricket_games`
+- [x] T014 [US4] Remove the old confirmation dialog, reset mock data button code, and associated mock data reset handlers from `src/pages/HistoricalStatsPage.js`
 
 **Checkpoint**: All user stories are now fully functional and integrated
 
@@ -108,8 +108,9 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T015 Ensure all React, MUI, and Helper imports are clean, and run `npm run build` or build steps to ensure there are zero type or compiler errors
-- [ ] T016 Run through manual validation scenarios in `quickstart.md` to guarantee perfect browser functionality and layout responsiveness
+- [x] T015 Ensure all React, MUI, and Helper imports are clean, and run `npm run build` or build steps to ensure there are zero type or compiler errors
+- [x] T016 Run through manual validation scenarios in `quickstart.md` to guarantee perfect browser functionality and layout responsiveness
+- [x] T017 Add option to delete the game record entry from the Edit Game Dialog form (`src/components/GameForm.js`) with propagation through `EditGameDialog.js` to `HistoricalStatsPage.js`
 
 ---
 

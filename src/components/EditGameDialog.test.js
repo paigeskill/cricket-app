@@ -4,11 +4,12 @@ import EditGameDialog from './EditGameDialog';
 
 // Mock GameForm to isolate EditGameDialog rendering
 jest.mock('./GameForm', () => {
-  return function MockForm({ initialData, defaultTab, onSave }) {
+  return function MockForm({ initialData, defaultTab, onSave, onDelete }) {
     return (
       <div data-testid="mock-game-form">
         Form prefilled with {initialData.club} and active tab {defaultTab}
         <button onClick={() => onSave({ ...initialData, runs_scored: 99 })}>Save</button>
+        {onDelete && <button onClick={() => onDelete(initialData.id)}>Delete</button>}
       </div>
     );
   };
@@ -97,5 +98,25 @@ describe('EditGameDialog Component', () => {
 
     expect(mockOnSave).toHaveBeenCalledTimes(1);
     expect(mockOnSave).toHaveBeenCalledWith({ ...mockGame, runs_scored: 99 });
+  });
+
+  test('submitting nested GameForm delete invokes onDelete callback prop', () => {
+    const mockOnDelete = jest.fn();
+    render(
+      <EditGameDialog
+        open={true}
+        onClose={mockOnClose}
+        game={mockGame}
+        defaultTab={1}
+        onSave={mockOnSave}
+        onDelete={mockOnDelete}
+      />
+    );
+
+    const deleteButton = screen.getByRole('button', { name: /Delete/i });
+    fireEvent.click(deleteButton);
+
+    expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    expect(mockOnDelete).toHaveBeenCalledWith('1');
   });
 });
