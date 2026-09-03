@@ -140,14 +140,14 @@ describe('StatsTable Component', () => {
     fireEvent.click(fieldingTab);
 
     // Assert fielding headers and values
-    expect(screen.getByText('Catches')).toBeInTheDocument();
-    expect(screen.getAllByText('Run Outs')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Outfield Catches')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Outfield RO')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Stumpings')[0]).toBeInTheDocument();
-    expect(screen.getByText('Byes Conceded')).toBeInTheDocument();
+    expect(screen.getByText('Byes')).toBeInTheDocument();
 
     // Verify values exist
-    expect(screen.getByText('Total Catches')).toBeInTheDocument();
-    expect(screen.getAllByText('1')[0]).toBeInTheDocument(); // Catch in Game 1
+    expect(screen.getAllByText('Victims')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('1')[0]).toBeInTheDocument(); // Catch/value in Game 1
     expect(screen.getByText('4')).toBeInTheDocument(); // Wicketkeeper byes in Game 2
   });
 
@@ -160,6 +160,6 @@ describe('StatsTable Component', () => {
     fireEvent.click(editButtons[0]);
 
     expect(mockOnEdit).toHaveBeenCalledTimes(1);
-    expect(mockOnEdit).toHaveBeenCalledWith(mockGames[0]);
+    expect(mockOnEdit).toHaveBeenCalledWith(mockGames[0], 1);
   });
 });

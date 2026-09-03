@@ -78,9 +78,12 @@ describe('GameForm Component', () => {
       maidens_bowled: 0,
       runs_conceded: 0,
       wickets_taken: 0,
+      is_keeper: false,
       catches: 0,
       run_outs: 0,
+      catches_keeper: 0,
       stumpings: 0,
+      run_outs_keeper: 0,
       byes_conceded: 0
     });
   });
@@ -132,9 +135,12 @@ describe('GameForm Component', () => {
         maidens_bowled: 0,
         runs_conceded: 0,
         wickets_taken: 0,
+        is_keeper: false,
         catches: 0,
         run_outs: 0,
+        catches_keeper: 0,
         stumpings: 0,
+        run_outs_keeper: 0,
         byes_conceded: 0
       });
     });
@@ -200,9 +206,12 @@ describe('GameForm Component', () => {
       maidens_bowled: 1,
       runs_conceded: 18,
       wickets_taken: 2,
+      is_keeper: false,
       catches: 0,
       run_outs: 0,
+      catches_keeper: 0,
       stumpings: 0,
+      run_outs_keeper: 0,
       byes_conceded: 0
     });
   });
@@ -252,9 +261,12 @@ describe('GameForm Component', () => {
       maidens_bowled: 0,
       runs_conceded: 0,
       wickets_taken: 0,
+      is_keeper: false,
       catches: 0,
       run_outs: 0,
+      catches_keeper: 0,
       stumpings: 0,
+      run_outs_keeper: 0,
       byes_conceded: 0
     });
   });

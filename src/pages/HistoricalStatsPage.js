@@ -12,12 +12,11 @@ import {
   DialogActions
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AnalyticsIcon from '@mui/icons-material/BarChart';
 import StatsTable from '../components/StatsTable';
-import GameForm from '../components/GameForm';
+import EditGameDialog from '../components/EditGameDialog';
 import { initialMockGames } from '../data/mockData';
 
 function HistoricalStatsPage() {
@@ -25,6 +24,7 @@ function HistoricalStatsPage() {
   const [games, setGames] = useState([]);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [selectedGameToEdit, setSelectedGameToEdit] = useState(null);
+  const [defaultFormTab, setDefaultFormTab] = useState(0);
 
   // Load games from localStorage or fallback to default mock data
   useEffect(() => {
@@ -48,6 +48,11 @@ function HistoricalStatsPage() {
     localStorage.setItem('cricket_games', JSON.stringify(updatedGames));
     setGames(updatedGames);
     setSelectedGameToEdit(null);
+  };
+
+  const handleEditClick = (game, defaultTab) => {
+    setSelectedGameToEdit(game);
+    setDefaultFormTab(defaultTab || 0);
   };
 
   return (
@@ -98,10 +103,10 @@ function HistoricalStatsPage() {
       </Typography>
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        This page displays a dashboard of your historical batting performances for all matches played in 2026.
+        This page displays a dashboard of your historical batting performances for all matches played.
       </Typography>
 
-      <StatsTable games={games} onEditGame={setSelectedGameToEdit} />
+      <StatsTable games={games} onEditGame={handleEditClick} />
 
       {/* Reset Confirmation Dialog */}
       <Dialog
@@ -128,23 +133,14 @@ function HistoricalStatsPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Game Modal Dialog */}
-      <Dialog 
-        open={!!selectedGameToEdit} 
+      {/* Reusable Edit Game Modal Component */}
+      <EditGameDialog
+        open={!!selectedGameToEdit}
         onClose={() => setSelectedGameToEdit(null)}
-        maxWidth="sm" 
-        fullWidth
-      >
-        <DialogTitle sx={{ fontWeight: 'bold' }}>Edit Game Details</DialogTitle>
-        <DialogContent sx={{ p: 0 }}>
-          {selectedGameToEdit && (
-            <GameForm
-              initialData={selectedGameToEdit}
-              onSave={handleUpdateGame}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        game={selectedGameToEdit}
+        defaultTab={defaultFormTab}
+        onSave={handleUpdateGame}
+      />
     </Box>
   );
 }

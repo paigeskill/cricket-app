@@ -3,20 +3,20 @@ import {
   Chip,
   Typography,
   Box,
-  Card,
-  CardContent,
-  Grid,
   Tabs,
   Tab,
   TableCell,
   TableRow,
-  IconButton
+  IconButton,
+  ToggleButtonGroup,
+  ToggleButton
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import CricketTable from './CricketTable';
 import GameRowCells from './GameRowCells';
+import StatsCard from './StatsCard';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -40,27 +40,33 @@ function TabPanel(props) {
 
 function StatsTable({ games, onEditGame }) {
   const [activeTab, setActiveTab] = useState(0);
+  const [statsRange, setStatsRange] = useState('Current Year');
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  // --- BATTING CALCULATIONS ---
-  const totalMatches = games.length;
-  const totalRuns = games.reduce((sum, g) => sum + (g.runs_scored || 0), 0);
-  const highestScore = games.length > 0 ? Math.max(...games.map(g => g.runs_scored || 0)) : 0;
-  const timesOut = games.filter(g => g.is_out).length;
-  const battingAverage = timesOut > 0 ? (totalRuns / timesOut).toFixed(2) : 'N/A';
-  const totalInningsBatted = games.filter(g => !g.did_not_bat && g.runs_scored !== null).length;
+  // Filter games specifically for aggregate summary cards calculations
+  const summaryGames = statsRange === 'Current Year'
+    ? games.filter(g => g.date && g.date.substring(0, 4) === '2026')
+    : games;
 
-  // --- BOWLING CALCULATIONS ---
-  const bowlingGames = games.filter(g => (g.overs_bowled || 0) > 0);
-  const totalWickets = games.reduce((sum, g) => sum + (g.wickets_taken || 0), 0);
-  const totalRunsConceded = games.reduce((sum, g) => sum + (g.runs_conceded || 0), 0);
-  const totalMaidens = games.reduce((sum, g) => sum + (g.maidens_bowled || 0), 0);
+  // --- BATTING CALCULATIONS (using filtered summaryGames) ---
+  const totalMatches = summaryGames.length;
+  const totalRuns = summaryGames.reduce((sum, g) => sum + (g.runs_scored || 0), 0);
+  const highestScore = summaryGames.length > 0 ? Math.max(...summaryGames.map(g => g.runs_scored || 0)) : 0;
+  const timesOut = summaryGames.filter(g => g.is_out).length;
+  const battingAverage = timesOut > 0 ? (totalRuns / timesOut).toFixed(2) : 'N/A';
+  const totalInningsBatted = summaryGames.filter(g => !g.did_not_bat && g.runs_scored !== null).length;
+
+  // --- BOWLING CALCULATIONS (using filtered summaryGames) ---
+  const bowlingGames = summaryGames.filter(g => (g.overs_bowled || 0) > 0);
+  const totalWickets = summaryGames.reduce((sum, g) => sum + (g.wickets_taken || 0), 0);
+  const totalRunsConceded = summaryGames.reduce((sum, g) => sum + (g.runs_conceded || 0), 0);
+  const totalMaidens = summaryGames.reduce((sum, g) => sum + (g.maidens_bowled || 0), 0);
   
   // Calculate total balls bowled
-  const totalBallsBowled = games.reduce((sum, g) => {
+  const totalBallsBowled = summaryGames.reduce((sum, g) => {
     const overs = g.overs_bowled || 0;
     const balls = (Math.floor(overs) * 6) + Math.round((overs % 1) * 10);
     return sum + balls;
@@ -77,7 +83,7 @@ function StatsTable({ games, onEditGame }) {
     let maxWickets = -1;
     let minRuns = Infinity;
     
-    games.forEach(g => {
+    summaryGames.forEach(g => {
       const wickets = g.wickets_taken || 0;
       const runs = g.runs_conceded || 0;
       const overs = g.overs_bowled || 0;
@@ -96,10 +102,14 @@ function StatsTable({ games, onEditGame }) {
     }
   }
 
-  // --- FIELDING CALCULATIONS ---
-  const totalCatches = games.reduce((sum, g) => sum + (g.catches || 0), 0);
-  const totalRunOuts = games.reduce((sum, g) => sum + (g.run_outs || 0), 0);
-  const totalStumpings = games.reduce((sum, g) => sum + (g.stumpings || 0), 0);
+  // --- FIELDING CALCULATIONS (using filtered summaryGames) ---
+  const totalCatchesOutfield = summaryGames.reduce((sum, g) => sum + (!g.is_keeper ? (g.catches || 0) : 0), 0);
+  const totalRunOuts = summaryGames.reduce((sum, g) => sum + (!g.is_keeper ? (g.run_outs || 0) : 0), 0);
+  const totalCatchesKeeper = summaryGames.reduce((sum, g) => sum + (g.is_keeper ? (g.catches_keeper || 0) : 0), 0);
+  const totalStumpings = summaryGames.reduce((sum, g) => sum + (g.stumpings || 0), 0);
+  const totalRunOutsKeeper = summaryGames.reduce((sum, g) => sum + (g.is_keeper ? (g.run_outs_keeper || 0) : 0), 0);
+  const totalByesConceded = summaryGames.reduce((sum, g) => sum + (g.byes_conceded || 0), 0);
+  const totalVictims = totalCatchesKeeper + totalStumpings;
 
   // Helper to calculate statistics for a bowling row
   const getBowlingRowStats = (game) => {
@@ -138,99 +148,59 @@ function StatsTable({ games, onEditGame }) {
 
   const fieldingHeaders = [
     { text: 'Date' }, { text: 'Club' }, { text: 'Opponent' }, { text: 'Venue' },
-    { text: 'Catches', align: 'right' }, { text: 'Run Outs', align: 'right' },
-    { text: 'Stumpings', align: 'right' }, { text: 'Byes Conceded', align: 'right' }, { text: 'Edit', align: 'center' }
+    { text: 'Role' },
+    { text: 'Outfield Catches', align: 'right' },
+    { text: 'Outfield RO', align: 'right' },
+    { text: 'Keeper Catches', align: 'right' },
+    { text: 'Keeper RO', align: 'right' },
+    { text: 'Stumpings', align: 'right' },
+    { text: 'Byes', align: 'right' },
+    { text: 'Victims', align: 'right' },
+    { text: 'Edit', align: 'center' }
   ];
 
   return (
     <Box sx={{ width: '100%' }}>
+      {/* Range filter toggle */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+        <ToggleButtonGroup
+          color="primary"
+          value={statsRange}
+          exclusive
+          onChange={(e, val) => val && setStatsRange(val)}
+          size="small"
+          aria-label="stats time range"
+        >
+          <ToggleButton value="Current Year" aria-label="current year stats" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
+            Current Year (2026)
+          </ToggleButton>
+          <ToggleButton value="All Time" aria-label="all time stats" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
+            All Time
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+
       {/* Dynamic aggregate summaries based on active tab */}
       {activeTab === 0 && (
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {/* 1. Matches Played */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center', px: 1 }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Matches Played
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  {totalMatches}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* 2. Innings Batted */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center', px: 1 }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Innings Batted
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                  {totalInningsBatted}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* 3. Total Runs */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center', px: 1 }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Total Runs
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
-                  {totalRuns}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* 4. Highest Score */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center', px: 1 }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Highest Score
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'info.main' }}>
-                  {highestScore}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* 5. Times Dismissed */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center', px: 1 }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Times Dismissed
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'error.light' }}>
-                  {timesOut}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* 6. Batting Average */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center', px: 1 }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Batting Average
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
-                  {battingAverage}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(1, 1fr)',
+              sm: 'repeat(3, 1fr)',
+              md: 'repeat(6, 1fr)'
+            },
+            gap: 2,
+            mb: 4
+          }}
+        >
+          <StatsCard title="Matches Played" value={totalMatches} color="primary.main" />
+          <StatsCard title="Innings Batted" value={totalInningsBatted} color="success.main" />
+          <StatsCard title="Total Runs" value={totalRuns} color="secondary.main" />
+          <StatsCard title="Highest Score" value={highestScore} color="info.main" />
+          <StatsCard title="Times Dismissed" value={timesOut} color="error.light" />
+          <StatsCard title="Batting Average" value={battingAverage} color="warning.main" />
+        </Box>
       )}
 
       {activeTab === 1 && (
@@ -239,150 +209,78 @@ function StatsTable({ games, onEditGame }) {
             display: 'grid',
             gridTemplateColumns: {
               xs: 'repeat(1, 1fr)',
-              sm: 'repeat(3, 1fr)',
-              md: 'repeat(7, 1fr)'
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(4, 1fr)'
             },
             gap: 2,
             mb: 4
           }}
         >
-          {/* 1. Overs */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Overs Bowled
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                {totalOversEquivalent > 0 ? `${Math.floor(totalOversEquivalent)}.${totalBallsBowled % 6}` : '0.0'}
-              </Typography>
-            </CardContent>
-          </Card>
+          {/* Row 1: Key Quantity Metrics */}
+          <StatsCard
+            title="Overs Bowled"
+            value={totalOversEquivalent > 0 ? `${Math.floor(totalOversEquivalent)}.${totalBallsBowled % 6}` : '0.0'}
+            color="primary.main"
+          />
+          <StatsCard title="Runs Given Away" value={totalRunsConceded} color="secondary.main" />
+          <StatsCard title="Total Maidens" value={totalMaidens} color="success.main" />
+          <StatsCard title="Total Wickets" value={totalWickets} color="info.main" />
 
-          {/* 2. Maidens */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Total Maidens
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                {totalMaidens}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* 3. Wickets */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Total Wickets
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
-                {totalWickets}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* 4. Best Bowling */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Best Bowling
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'info.main' }}>
-                {bestBowling}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* 5. Economy */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Bowling Economy
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
-                {overallEconomy}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* 6. Average */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Bowling Average
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'error.light' }}>
-                {overallBowlingAverage}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* 7. Strike Rate */}
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center', px: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Bowling SR
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.light' }}>
-                {overallBowlingSR}
-              </Typography>
-            </CardContent>
-          </Card>
+          {/* Row 2: Secondary Performance Aggregates */}
+          <StatsCard title="Best Bowling" value={bestBowling} color="primary.light" />
+          <StatsCard title="Bowling Economy" value={overallEconomy} color="warning.main" />
+          <StatsCard title="Bowling Average" value={overallBowlingAverage} color="error.light" />
+          <StatsCard title="Bowling SR" value={overallBowlingSR} color="error.main" />
         </Box>
       )}
 
       {activeTab === 2 && (
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Total Catches
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  {totalCatches}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Run Outs
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
-                  {totalRunOuts}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Stumpings
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'info.main' }}>
-                  {totalStumpings}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  Total Fielding Acts
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
-                  {totalCatches + totalRunOuts + totalStumpings}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        <Box sx={{ mb: 4 }}>
+          {/* Outfield section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" color="primary.light" sx={{ fontWeight: 'bold', mb: 1.5 }}>
+              Outfield Performance
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(1, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(4, 1fr)'
+                },
+                gap: 2
+              }}
+            >
+              <StatsCard title="Outfield Catches" value={totalCatchesOutfield} color="primary.main" />
+              <StatsCard title="Outfield RO" value={totalRunOuts} color="secondary.main" />
+            </Box>
+          </Box>
+
+          {/* Keeper section */}
+          <Box>
+            <Typography variant="subtitle2" color="success.light" sx={{ fontWeight: 'bold', mb: 1.5, mt: 2 }}>
+              Wicketkeeping Performance
+            </Typography>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(1, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(5, 1fr)'
+                },
+                gap: 2
+              }}
+            >
+              <StatsCard title="Keeper Catches" value={totalCatchesKeeper} color="info.main" />
+              <StatsCard title="Keeper RO" value={totalRunOutsKeeper} color="primary.light" />
+              <StatsCard title="Stumpings" value={totalStumpings} color="warning.main" />
+              <StatsCard title="Byes Conceded" value={totalByesConceded} color="error.light" />
+              <StatsCard title="Victims" value={totalVictims} color="success.main" />
+            </Box>
+          </Box>
+        </Box>
       )}
 
       {/* Tabs selector */}
@@ -457,7 +355,7 @@ function StatsTable({ games, onEditGame }) {
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <IconButton onClick={() => onEditGame(game)} size="small" color="primary" aria-label="edit batting performance">
+                  <IconButton onClick={() => onEditGame(game, 1)} size="small" color="primary" aria-label="edit batting performance">
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -490,7 +388,7 @@ function StatsTable({ games, onEditGame }) {
                 <TableCell align="right">{stats.average}</TableCell>
                 <TableCell align="right">{stats.strikeRate}</TableCell>
                 <TableCell align="center">
-                  <IconButton onClick={() => onEditGame(game)} size="small" color="primary" aria-label="edit bowling performance">
+                  <IconButton onClick={() => onEditGame(game, 2)} size="small" color="primary" aria-label="edit bowling performance">
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
@@ -507,23 +405,55 @@ function StatsTable({ games, onEditGame }) {
           headers={fieldingHeaders}
           isEmpty={games.length === 0}
         >
-          {games.map((game) => (
-            <TableRow
-              key={game.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
-            >
-              <GameRowCells game={game} />
-              <TableCell align="right" sx={{ fontWeight: (game.catches || 0) > 0 ? 'bold' : 'normal' }}>{game.catches || 0}</TableCell>
-              <TableCell align="right" sx={{ fontWeight: (game.run_outs || 0) > 0 ? 'bold' : 'normal' }}>{game.run_outs || 0}</TableCell>
-              <TableCell align="right" sx={{ fontWeight: (game.stumpings || 0) > 0 ? 'bold' : 'normal' }}>{game.stumpings || 0}</TableCell>
-              <TableCell align="right">{game.byes_conceded || 0}</TableCell>
-              <TableCell align="center">
-                <IconButton onClick={() => onEditGame(game)} size="small" color="primary" aria-label="edit fielding performance">
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
+          {games.map((game) => {
+            const isKeeper = game.is_keeper || false;
+            const keeperCatches = isKeeper ? (game.catches_keeper || 0) : 0;
+            const stumpings = game.stumpings || 0;
+            const runOutsKeeper = isKeeper ? (game.run_outs_keeper || 0) : 0;
+            const victims = keeperCatches + stumpings;
+
+            return (
+              <TableRow
+                key={game.id}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+              >
+                <GameRowCells game={game} />
+                <TableCell>
+                  {isKeeper ? (
+                    <Chip label="Keeper" size="small" color="primary" variant="filled" sx={{ fontWeight: 'bold' }} />
+                  ) : (
+                    <Chip label="Outfield" size="small" color="default" variant="outlined" />
+                  )}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: (!isKeeper && (game.catches || 0) > 0) ? 'bold' : 'normal', color: !isKeeper && (game.catches || 0) > 0 ? 'primary.light' : 'text.primary' }}>
+                  {isKeeper ? '—' : (game.catches || 0)}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: (!isKeeper && (game.run_outs || 0) > 0) ? 'bold' : 'normal', color: !isKeeper && (game.run_outs || 0) > 0 ? 'secondary.main' : 'text.primary' }}>
+                  {isKeeper ? '—' : (game.run_outs || 0)}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: (isKeeper && keeperCatches > 0) ? 'bold' : 'normal', color: isKeeper && keeperCatches > 0 ? 'info.main' : 'text.primary' }}>
+                  {isKeeper ? keeperCatches : '—'}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: (isKeeper && runOutsKeeper > 0) ? 'bold' : 'normal', color: isKeeper && runOutsKeeper > 0 ? 'primary.light' : 'text.primary' }}>
+                  {isKeeper ? runOutsKeeper : '—'}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: (isKeeper && stumpings > 0) ? 'bold' : 'normal', color: isKeeper && stumpings > 0 ? 'warning.main' : 'text.primary' }}>
+                  {isKeeper ? stumpings : '—'}
+                </TableCell>
+                <TableCell align="right" sx={{ color: isKeeper && (game.byes_conceded || 0) > 0 ? 'error.light' : 'text.primary' }}>
+                  {isKeeper ? (game.byes_conceded || 0) : '—'}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: (isKeeper && victims > 0) ? 'bold' : 'normal', color: isKeeper && victims > 0 ? 'success.main' : 'text.primary' }}>
+                  {isKeeper ? victims : '—'}
+                </TableCell>
+                <TableCell align="center">
+                  <IconButton onClick={() => onEditGame(game, 3)} size="small" color="primary" aria-label="edit fielding performance">
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </CricketTable>
       </TabPanel>
     </Box>
