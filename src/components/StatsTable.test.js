@@ -123,8 +123,8 @@ describe('StatsTable Component', () => {
     // Average: 18 / 2 = 9.00
     // Strike Rate: 26 / 2 = 13.00
     expect(screen.getAllByText('4.15')[0]).toBeInTheDocument();
-    expect(screen.getByText('9.00')).toBeInTheDocument();
-    expect(screen.getByText('13.00')).toBeInTheDocument();
+    expect(screen.getAllByText('9.00')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('13.00')[0]).toBeInTheDocument();
 
     // Dashboard totals for bowling
     expect(screen.getByText('Total Wickets')).toBeInTheDocument();
@@ -149,5 +149,17 @@ describe('StatsTable Component', () => {
     expect(screen.getByText('Total Catches')).toBeInTheDocument();
     expect(screen.getAllByText('1')[0]).toBeInTheDocument(); // Catch in Game 1
     expect(screen.getByText('4')).toBeInTheDocument(); // Wicketkeeper byes in Game 2
+  });
+
+  test('clicking edit button triggers onEditGame callback prop', () => {
+    const mockOnEdit = jest.fn();
+    render(<StatsTable games={mockGames} onEditGame={mockOnEdit} />);
+
+    // Get Edit button on the first row of batting scorecard
+    const editButtons = screen.getAllByRole('button', { name: /edit batting performance/i });
+    fireEvent.click(editButtons[0]);
+
+    expect(mockOnEdit).toHaveBeenCalledTimes(1);
+    expect(mockOnEdit).toHaveBeenCalledWith(mockGames[0]);
   });
 });

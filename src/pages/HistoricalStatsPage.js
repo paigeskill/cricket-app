@@ -17,12 +17,14 @@ import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AnalyticsIcon from '@mui/icons-material/BarChart';
 import StatsTable from '../components/StatsTable';
+import GameForm from '../components/GameForm';
 import { initialMockGames } from '../data/mockData';
 
 function HistoricalStatsPage() {
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [selectedGameToEdit, setSelectedGameToEdit] = useState(null);
 
   // Load games from localStorage or fallback to default mock data
   useEffect(() => {
@@ -39,6 +41,13 @@ function HistoricalStatsPage() {
     localStorage.setItem('cricket_games', JSON.stringify(initialMockGames));
     setGames(initialMockGames);
     setResetDialogOpen(false);
+  };
+
+  const handleUpdateGame = (updatedGame) => {
+    const updatedGames = games.map(g => g.id === updatedGame.id ? updatedGame : g);
+    localStorage.setItem('cricket_games', JSON.stringify(updatedGames));
+    setGames(updatedGames);
+    setSelectedGameToEdit(null);
   };
 
   return (
@@ -92,7 +101,7 @@ function HistoricalStatsPage() {
         This page displays a dashboard of your historical batting performances for all matches played in 2026.
       </Typography>
 
-      <StatsTable games={games} />
+      <StatsTable games={games} onEditGame={setSelectedGameToEdit} />
 
       {/* Reset Confirmation Dialog */}
       <Dialog
@@ -117,6 +126,24 @@ function HistoricalStatsPage() {
             Confirm Reset
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Edit Game Modal Dialog */}
+      <Dialog 
+        open={!!selectedGameToEdit} 
+        onClose={() => setSelectedGameToEdit(null)}
+        maxWidth="sm" 
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 'bold' }}>Edit Game Details</DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {selectedGameToEdit && (
+            <GameForm
+              initialData={selectedGameToEdit}
+              onSave={handleUpdateGame}
+            />
+          )}
+        </DialogContent>
       </Dialog>
     </Box>
   );
