@@ -100,6 +100,25 @@ describe('analyticsHelper Utility', () => {
     expect(stat2025.runsPerDismissal).toBe('N/A');
   });
 
+  test('groupStatistics groups by Venue (Home / Away) successfully', () => {
+    const stats = groupStatistics(mockGames, 'Venue');
+    
+    // Grouping should yield 'Home' and 'Away'
+    expect(stats).toHaveLength(2);
+    
+    const homeStats = stats.find(s => s.key === 'Home');
+    // Home has game 1 (50 runs, out) and game 3 (DNB)
+    expect(homeStats.totalRuns).toBe(50);
+    expect(homeStats.inningsBatted).toBe(1);
+    expect(homeStats.battingAverage).toBe(50.00);
+
+    const awayStats = stats.find(s => s.key === 'Away');
+    // Away has game 2 (100 runs, not out)
+    expect(awayStats.totalRuns).toBe(100);
+    expect(awayStats.inningsBatted).toBe(1);
+    expect(awayStats.battingAverage).toBe(100.00);
+  });
+
   test('compileDismissalBreakdown aggregates dismissal counts and percentages', () => {
     const breakdown = compileDismissalBreakdown(mockGames);
     expect(breakdown).toHaveLength(1); // 1 dismissal total (Caught)

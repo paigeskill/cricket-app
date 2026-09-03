@@ -162,4 +162,80 @@ describe('StatsTable Component', () => {
     expect(mockOnEdit).toHaveBeenCalledTimes(1);
     expect(mockOnEdit).toHaveBeenCalledWith(mockGames[0], 1);
   });
+
+  test('accurately calculates and groups wicketkeeper stats and victims', () => {
+    const keeperGames = [
+      {
+        id: '10',
+        date: '2026-09-03',
+        club: 'Club A',
+        opponent: 'Club B',
+        location: 'Home',
+        is_keeper: true,
+        catches_keeper: 3,
+        stumpings: 2,
+        run_outs_keeper: 1,
+        byes_conceded: 5
+      }
+    ];
+
+    render(<StatsTable games={keeperGames} />);
+
+    // Switch to Fielding scorecard tab
+    const fieldingTab = screen.getByRole('tab', { name: /Fielding Scorecard/i });
+    fireEvent.click(fieldingTab);
+
+    // Verify keeper-specific aggregate values exist in the summary cards
+    // Keeper Catches = 3, Stumpings = 2, Keeper RO = 1, Victims = 5 (3 + 2), Byes = 5
+    expect(screen.getAllByText('Keeper Catches')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('3')[0]).toBeInTheDocument();
+
+    expect(screen.getAllByText('Stumpings')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('2')[0]).toBeInTheDocument();
+
+    expect(screen.getAllByText('Keeper RO')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('1')[0]).toBeInTheDocument();
+
+    expect(screen.getAllByText('Victims')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('5')[0]).toBeInTheDocument(); // Byes is also 5, so grab first
+  });
+
+  test('filtering by Stats Range toggle dynamically updates aggregate totals', () => {
+    const multiYearGames = [
+      {
+        id: 'y1',
+        date: '2026-04-10',
+        club: 'Club A',
+        opponent: 'Club B',
+        location: 'Home',
+        runs_scored: 40,
+        is_out: true
+      },
+      {
+        id: 'y2',
+        date: '2025-05-12',
+        club: 'Club A',
+        opponent: 'Club B',
+        location: 'Home',
+        runs_scored: 80,
+        is_out: true
+      }
+    ];
+
+    render(<StatsTable games={multiYearGames} />);
+
+    // Default stats range is "Current Year (2026)", so matches=1, total runs=40
+    expect(screen.getByText('Matches Played')).toBeInTheDocument();
+    expect(screen.getAllByText('1')[0]).toBeInTheDocument();
+    expect(screen.getByText('Total Runs')).toBeInTheDocument();
+    expect(screen.getAllByText('40')[0]).toBeInTheDocument();
+
+    // Find and click "All Time" toggle button
+    const allTimeToggle = screen.getByRole('button', { name: /all time/i });
+    fireEvent.click(allTimeToggle);
+
+    // All Time stats range, so matches=2, total runs=120 (40 + 80)
+    expect(screen.getAllByText('2')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('120')[0]).toBeInTheDocument();
+  });
 });

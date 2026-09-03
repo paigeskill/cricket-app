@@ -270,4 +270,36 @@ describe('GameForm Component', () => {
       byes_conceded: 0
     });
   });
+
+  test('toggles wicket keeper and dynamically renders keeper inputs on the Fielding tab', async () => {
+    render(<GameForm onSave={mockOnSave} />);
+
+    // Navigate to Fielding tab
+    const fieldingTab = screen.getByRole('tab', { name: /Fielding/i });
+    fireEvent.click(fieldingTab);
+
+    // Default role is Outfield, so Outfield inputs exist
+    expect(screen.getByLabelText(/^Catches Taken$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Run Outs$/i)).toBeInTheDocument();
+
+    // Keeper inputs should NOT exist by default
+    expect(screen.queryByLabelText(/Catches Taken \(As Keeper\)/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Keeper Run Outs/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Stumpings Taken/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Byes Conceded/i)).not.toBeInTheDocument();
+
+    // Toggle "Wicket Keeper" switch ON
+    const keeperSwitch = screen.getByLabelText(/Role: Outfield Fielder/i);
+    fireEvent.click(keeperSwitch);
+
+    // Outfield inputs should now be unmounted/hidden
+    expect(screen.queryByLabelText(/^Catches Taken$/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Run Outs$/i)).not.toBeInTheDocument();
+
+    // Keeper inputs should now be visible/rendered
+    expect(screen.getByLabelText(/Catches Taken \(As Keeper\)/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Keeper Run Outs/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Stumpings Taken/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Byes Conceded/i)).toBeInTheDocument();
+  });
 });

@@ -277,7 +277,7 @@ function AnalyticsDashboard() {
 
       {/* Tab 1: Runs & Averages */}
       <TabPanel value={activeTab} index={0}>
-        <Stack direction="row" spacing={3} alignItems="center" sx={{ mb: 3, flexWrap: 'wrap', gap: 2 }}>
+        <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 3 }}>
           {/* Grouping Select dropdown */}
           <GroupBySelect value={groupBy} onChange={setGroupBy} labelId="groupby" />
 
@@ -346,7 +346,7 @@ function AnalyticsDashboard() {
 
       {/* Tab 2: Dismissal Breakdown */}
       <TabPanel value={activeTab} index={1}>
-        <Stack direction="row" spacing={3} alignItems="center" sx={{ mb: 3, flexWrap: 'wrap', gap: 2 }}>
+        <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 3 }}>
           {/* Dismissal Group By Dimension */}
           <GroupBySelect value={dismissalGroupBy} onChange={setDismissalGroupBy} labelId="dismissal-groupby" />
 

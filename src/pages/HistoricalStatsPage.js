@@ -58,7 +58,7 @@ function HistoricalStatsPage() {
   return (
     <Box>
       {/* Header action bar */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4, flexWrap: 'wrap', gap: 2 }}>
+      <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/')}

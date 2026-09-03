@@ -50,7 +50,7 @@ function AnalyticsFilters({
 
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'background.paper' }}>
-      <Grid container spacing={3} alignItems="center">
+      <Grid container spacing={3} sx={{ alignItems: 'center' }}>
         {/* Row 1: Select Dropdowns (Wider md=6 each) */}
         <Grid item xs={12} md={6}>
           <FormControl fullWidth size="small">
