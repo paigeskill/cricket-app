@@ -91,6 +91,8 @@ describe('analyticsHelper Utility', () => {
     expect(stat2026.inningsBatted).toBe(2);
     expect(stat2026.battingAverage).toBe(75.00);
     expect(stat2026.runsPerDismissal).toBe(150.00);
+    expect(stat2026.dismissals['Caught']).toBe(1);
+    expect(stat2026.dismissals['Not Out']).toBe(1);
 
     // 2025 has 1 game but DNB, so innings=0, runs=0, avg=0.00, runs/srd="N/A"
     const stat2025 = stats.find(s => s.key === '2025');

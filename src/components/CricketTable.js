@@ -35,7 +35,7 @@ function CricketTable({
               <TableCell
                 key={i}
                 align={h.align || 'left'}
-                sx={{ color: 'primary.contrastText', fontWeight: 'bold' }}
+                sx={{ color: '#ffffff', fontWeight: 'bold' }}
               >
                 {h.text}
               </TableCell>

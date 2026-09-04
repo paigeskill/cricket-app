@@ -65,8 +65,8 @@ describe('AnalyticsDashboard Page', () => {
     // Assert default aggregate cards
     expect(screen.getByText('Subset Innings Batted')).toBeInTheDocument();
     expect(screen.getByText('Subset Total Runs')).toBeInTheDocument();
-    expect(screen.getByText('Subset Average')).toBeInTheDocument();
-    expect(screen.getAllByText('Runs / Dismissal')[0]).toBeInTheDocument();
+    expect(screen.getByText('Subset Runs / Dismissal')).toBeInTheDocument();
+    expect(screen.getByText('Subset Runs / Inning')).toBeInTheDocument();
   });
 
   test('toggles scorecard views between Table and Graph', async () => {
@@ -113,8 +113,31 @@ describe('AnalyticsDashboard Page', () => {
     const comparativeTab = screen.getByRole('tab', { name: /Side-by-Side Comparison/i });
     fireEvent.click(comparativeTab);
 
-    // Verify comparative side-by-side elements are rendered (under Year grouping, 2026 vs 2025)
-    expect(await screen.findByLabelText(/Compare Item A/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Compare Item B/i)).toBeInTheDocument();
+    // Verify comparative side-by-side elements are rendered (under Home vs Away default grouping)
+    expect(await screen.findByLabelText(/Comparison Type/i)).toBeInTheDocument();
+    expect(screen.getByText(/Home Summary/i)).toBeInTheDocument();
+    expect(screen.getByText(/Away Summary/i)).toBeInTheDocument();
+  });
+
+  test('handles Batting Positions multiselect comparison successfully', async () => {
+    renderWithRouter(<AnalyticsDashboard />);
+
+    // Wait for mock data to load
+    expect(await screen.findByRole('heading', { level: 4, name: '2' })).toBeInTheDocument();
+
+    // Click Side-by-Side Comparison tab
+    const comparativeTab = screen.getByRole('tab', { name: /Side-by-Side Comparison/i });
+    fireEvent.click(comparativeTab);
+
+    // Open comparison type dropdown and select "Batting Positions"
+    const compTypeSelect = screen.getByLabelText(/Comparison Type/i);
+    fireEvent.mouseDown(compTypeSelect);
+    
+    const option = await screen.findByText('Batting Positions');
+    fireEvent.click(option);
+
+    // Verify batting position groups render
+    expect(screen.getByLabelText(/Positions Group A/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Positions Group B/i)).toBeInTheDocument();
   });
 });

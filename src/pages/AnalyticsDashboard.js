@@ -18,7 +18,10 @@ import {
   TableCell,
   TableRow,
   Stack,
-  Paper
+  Paper,
+  TextField,
+  Checkbox,
+  ListItemText
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TableRowsIcon from '@mui/icons-material/TableRows';
@@ -85,8 +88,42 @@ function AnalyticsDashboard() {
   const [dismissalGroupOptions, setDismissalGroupOptions] = useState([]);
 
   // Comparative State
-  const [compItemA, setCompItemA] = useState('');
-  const [compItemB, setCompItemB] = useState('');
+  const [compType, setCompType] = useState('Home vs Away');
+  const [compPosA, setCompPosA] = useState([]);
+  const [compPosB, setCompPosB] = useState([]);
+  const [compMonthA, setCompMonthA] = useState('06'); // June
+  const [compMonthB, setCompMonthB] = useState('08'); // August
+  const [periodAStart, setPeriodAStart] = useState('');
+  const [periodAEnd, setPeriodAEnd] = useState('');
+  const [periodBStart, setPeriodBStart] = useState('');
+  const [periodBEnd, setPeriodBEnd] = useState('');
+
+  // Dynamically initialize periods and positions based on loaded games
+  useEffect(() => {
+    if (games.length > 0) {
+      const years = games.map(g => g.date ? g.date.substring(0, 4) : '2026');
+      const maxYear = years.length > 0 ? Math.max(...years.map(Number)) : 2026;
+      setPeriodAStart(`${maxYear}-06-01`);
+      setPeriodAEnd(`${maxYear}-07-31`);
+      setPeriodBStart(`${maxYear}-08-01`);
+      setPeriodBEnd(`${maxYear}-09-30`);
+
+      const uniquePos = [...new Set(games.map(g => g.batting_number).filter(n => n !== null))].sort((a,b) => a-b);
+      if (uniquePos.length > 0) {
+        setCompPosA(uniquePos.slice(0, 3).map(String));
+        setCompPosB(uniquePos.slice(3, 5).map(String));
+      } else {
+        setCompPosA(['1', '2', '3']);
+        setCompPosB(['4', '5']);
+      }
+
+      const uniqueMonths = [...new Set(games.map(g => g.date ? g.date.substring(5, 7) : null).filter(Boolean))].sort();
+      if (uniqueMonths.length > 0) {
+        setCompMonthA(uniqueMonths[0]);
+        setCompMonthB(uniqueMonths[1] || uniqueMonths[0]);
+      }
+    }
+  }, [games]);
 
   // Load matches
   useEffect(() => {
@@ -114,20 +151,62 @@ function AnalyticsDashboard() {
   const filteredGames = filterGames(games, { selectedYears, selectedClubs, venue });
   const groupedStats = groupStatistics(filteredGames, groupBy);
 
-  // Automatically reset comparative selection whenever groupBy changes or games load
-  useEffect(() => {
-    if (groupedStats.length > 0) {
-      setCompItemA(groupedStats[0]?.key || '');
-      setCompItemB(groupedStats[1]?.key || (groupedStats[0]?.key || ''));
-    } else {
-      setCompItemA('');
-      setCompItemB('');
-    }
-  }, [groupBy, games, selectedYears, selectedClubs, venue]);
+  const computeStatsForGames = (subsetGames, labelKey) => {
+    const inningsBatted = subsetGames.filter(g => !g.did_not_bat).length;
+    const totalRuns = subsetGames.reduce((sum, g) => sum + (g.runs_scored || 0), 0);
+    
+    const dismissalsCount = subsetGames.filter(g => !g.did_not_bat && g.is_out).length;
+    const battingAverage = inningsBatted > 0 
+      ? Number((totalRuns / inningsBatted).toFixed(2))
+      : 0;
+    
+    const runsPerDismissal = dismissalsCount > 0 
+      ? Number((totalRuns / dismissalsCount).toFixed(2))
+      : 'N/A';
 
-  // Extract selected comparative stats
-  const statItemA = groupedStats.find(item => item.key === compItemA);
-  const statItemB = groupedStats.find(item => item.key === compItemB);
+    return {
+      key: labelKey,
+      inningsBatted,
+      totalRuns,
+      battingAverage,
+      runsPerDismissal
+    };
+  };
+
+  let statItemA = null;
+  let statItemB = null;
+
+  if (compType === 'Home vs Away') {
+    const gamesA = filteredGames.filter(g => g.location === 'Home');
+    const gamesB = filteredGames.filter(g => g.location === 'Away');
+    statItemA = computeStatsForGames(gamesA, 'Home');
+    statItemB = computeStatsForGames(gamesB, 'Away');
+  } else if (compType === 'Batting Positions') {
+    const gamesA = filteredGames.filter(g => g.batting_number !== null && compPosA.includes(String(g.batting_number)));
+    const gamesB = filteredGames.filter(g => g.batting_number !== null && compPosB.includes(String(g.batting_number)));
+    
+    const keyA = compPosA.length > 0 ? `Positions ${compPosA.sort((a,b) => Number(a) - Number(b)).join(', ')}` : 'No Positions A Selected';
+    const keyB = compPosB.length > 0 ? `Positions ${compPosB.sort((a,b) => Number(a) - Number(b)).join(', ')}` : 'No Positions B Selected';
+    
+    statItemA = computeStatsForGames(gamesA, keyA);
+    statItemB = computeStatsForGames(gamesB, keyB);
+  } else if (compType === 'Months') {
+    const gamesA = filteredGames.filter(g => g.date && g.date.substring(5, 7) === compMonthA);
+    const gamesB = filteredGames.filter(g => g.date && g.date.substring(5, 7) === compMonthB);
+    
+    const MONTHS_LABEL_MAP = {
+      '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+      '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+      '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+    };
+    statItemA = computeStatsForGames(gamesA, MONTHS_LABEL_MAP[compMonthA] || `Month ${compMonthA}`);
+    statItemB = computeStatsForGames(gamesB, MONTHS_LABEL_MAP[compMonthB] || `Month ${compMonthB}`);
+  } else if (compType === 'Periods') {
+    const gamesA = filteredGames.filter(g => g.date && g.date >= periodAStart && g.date <= periodAEnd);
+    const gamesB = filteredGames.filter(g => g.date && g.date >= periodBStart && g.date <= periodBEnd);
+    statItemA = computeStatsForGames(gamesA, 'Period A');
+    statItemB = computeStatsForGames(gamesB, 'Period B');
+  }
 
   // Sync Dismissal Grouping dropdown options
   useEffect(() => {
@@ -169,11 +248,20 @@ function AnalyticsDashboard() {
   const dismissalGroupedStats = groupStatistics(filteredGames, dismissalGroupBy);
 
   // Find all active dismissal methods in the filtered set of matches (used as column headings)
-  const activeDismissalMethods = Array.from(new Set(
+  const rawMethods = Array.from(new Set(
     filteredGames
-      .filter(g => !g.did_not_bat && g.is_out && g.dismissal && g.dismissal !== 'None' && g.dismissal !== 'DNB')
-      .map(g => g.dismissal)
-  )).sort();
+      .filter(g => !g.did_not_bat)
+      .map(g => {
+        if (!g.is_out) return 'Not Out';
+        return g.dismissal;
+      })
+      .filter(d => d && d !== 'None' && d !== 'DNB')
+  ));
+  const hasNotOut = rawMethods.includes('Not Out');
+  const actualDismissalsSorted = rawMethods.filter(d => d !== 'Not Out').sort();
+  const activeDismissalMethods = hasNotOut
+    ? [...actualDismissalsSorted, 'Not Out']
+    : actualDismissalsSorted;
 
   // Global totals for the active subset of matches
   const totalInnings = filteredGames.filter(g => !g.did_not_bat && g.runs_scored !== null).length;
@@ -244,10 +332,10 @@ function AnalyticsDashboard() {
           <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Subset Average
+                Subset Runs / Dismissal
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'info.main' }}>
-                {overallAvg}
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
+                {overallSRD}
               </Typography>
             </CardContent>
           </Card>
@@ -256,10 +344,10 @@ function AnalyticsDashboard() {
           <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Runs / Dismissal
+                Subset Runs / Inning
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
-                {overallSRD}
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'success.main' }}>
+                {overallAvg}
               </Typography>
             </CardContent>
           </Card>
@@ -308,8 +396,8 @@ function AnalyticsDashboard() {
               { text: groupBy },
               { text: 'Innings', align: 'right' },
               { text: 'Total Runs', align: 'right' },
-              { text: 'Average Runs', align: 'right' },
-              { text: 'Runs / Dismissal', align: 'right' }
+              { text: 'Runs / Dismissal', align: 'right' },
+              { text: 'Runs / Inning', align: 'right' }
             ]}
             isEmpty={groupedStats.length === 0}
             emptyMessage="No matches match the selected filters."
@@ -319,8 +407,8 @@ function AnalyticsDashboard() {
                 <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>{item.key}</TableCell>
                 <TableCell align="right">{item.inningsBatted}</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 'bold' }}>{item.totalRuns}</TableCell>
-                <TableCell align="right">{item.battingAverage}</TableCell>
                 <TableCell align="right">{item.runsPerDismissal}</TableCell>
+                <TableCell align="right">{item.battingAverage}</TableCell>
               </TableRow>
             ))}
           </CricketTable>
@@ -421,49 +509,164 @@ function AnalyticsDashboard() {
 
       {/* Tab 3: Comparative Analysis */}
       <TabPanel value={activeTab} index={2}>
-        {groupedStats.length < 2 ? (
+        {filteredGames.length < 2 ? (
           <Paper elevation={3} sx={{ p: 4, borderRadius: 3, textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'background.paper' }}>
             <Typography variant="h6" color="text.secondary">
-              At least two distinct items ({groupBy}s) are required to run comparative analysis. Add more matches or clear filters!
+              At least two matches are required to run comparative analysis. Add more matches or clear filters!
             </Typography>
           </Paper>
         ) : (
           <Box>
             {/* Pick Comparative Selectors */}
             <Stack direction="row" spacing={3} sx={{ mb: 4, flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel id="compare-a-label">Compare Item A</InputLabel>
+              <FormControl size="small" sx={{ minWidth: 200 }}>
+                <InputLabel id="comparison-type-label">Comparison Type</InputLabel>
                 <Select
-                  labelId="compare-a-label"
-                  value={compItemA}
-                  label="Compare Item A"
-                  onChange={(e) => setCompItemA(e.target.value)}
+                  labelId="comparison-type-label"
+                  value={compType}
+                  label="Comparison Type"
+                  onChange={(e) => setCompType(e.target.value)}
                 >
-                  {groupedStats.map(item => (
-                    <MenuItem key={item.key} value={item.key} disabled={item.key === compItemB}>
-                      {item.key}
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="Home vs Away">Home vs Away</MenuItem>
+                  <MenuItem value="Batting Positions">Batting Positions</MenuItem>
+                  <MenuItem value="Months">Months</MenuItem>
+                  <MenuItem value="Periods">Periods (Date Ranges)</MenuItem>
                 </Select>
               </FormControl>
 
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>vs</Typography>
+              {compType === 'Batting Positions' && (
+                <>
+                  <FormControl size="small" sx={{ minWidth: 180 }}>
+                    <InputLabel id="pos-a-label">Positions Group A</InputLabel>
+                    <Select
+                      labelId="pos-a-label"
+                      multiple
+                      value={compPosA}
+                      label="Positions Group A"
+                      onChange={(e) => setCompPosA(e.target.value)}
+                      renderValue={(selected) => selected.sort((a,b) => Number(a) - Number(b)).join(', ')}
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(pos => (
+                        <MenuItem key={pos} value={String(pos)}>
+                          <Checkbox checked={compPosA.includes(String(pos))} color="primary" size="small" />
+                          <ListItemText primary={String(pos)} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>vs</Typography>
+                  <FormControl size="small" sx={{ minWidth: 180 }}>
+                    <InputLabel id="pos-b-label">Positions Group B</InputLabel>
+                    <Select
+                      labelId="pos-b-label"
+                      multiple
+                      value={compPosB}
+                      label="Positions Group B"
+                      onChange={(e) => setCompPosB(e.target.value)}
+                      renderValue={(selected) => selected.sort((a,b) => Number(a) - Number(b)).join(', ')}
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(pos => (
+                        <MenuItem key={pos} value={String(pos)}>
+                          <Checkbox checked={compPosB.includes(String(pos))} color="secondary" size="small" />
+                          <ListItemText primary={String(pos)} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </>
+              )}
 
-              <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel id="compare-b-label">Compare Item B</InputLabel>
-                <Select
-                  labelId="compare-b-label"
-                  value={compItemB}
-                  label="Compare Item B"
-                  onChange={(e) => setCompItemB(e.target.value)}
-                >
-                  {groupedStats.map(item => (
-                    <MenuItem key={item.key} value={item.key} disabled={item.key === compItemA}>
-                      {item.key}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              {compType === 'Months' && (
+                <>
+                  <FormControl size="small" sx={{ minWidth: 150 }}>
+                    <InputLabel id="month-a-label">Month A</InputLabel>
+                    <Select
+                      labelId="month-a-label"
+                      value={compMonthA}
+                      label="Month A"
+                      onChange={(e) => setCompMonthA(e.target.value)}
+                    >
+                      {['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(m => {
+                        const MONTHS_LABEL_MAP = {
+                          '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+                          '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+                          '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+                        };
+                        return (
+                          <MenuItem key={m} value={m} disabled={m === compMonthB}>
+                            {MONTHS_LABEL_MAP[m]}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>vs</Typography>
+                  <FormControl size="small" sx={{ minWidth: 150 }}>
+                    <InputLabel id="month-b-label">Month B</InputLabel>
+                    <Select
+                      labelId="month-b-label"
+                      value={compMonthB}
+                      label="Month B"
+                      onChange={(e) => setCompMonthB(e.target.value)}
+                    >
+                      {['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(m => {
+                        const MONTHS_LABEL_MAP = {
+                          '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+                          '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+                          '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+                        };
+                        return (
+                          <MenuItem key={m} value={m} disabled={m === compMonthA}>
+                            {MONTHS_LABEL_MAP[m]}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </>
+              )}
+
+              {compType === 'Periods' && (
+                <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                  <TextField
+                    label="Period A Start"
+                    type="date"
+                    size="small"
+                    value={periodAStart}
+                    onChange={(e) => setPeriodAStart(e.target.value)}
+                    slotProps={{ shrink: true }}
+                    sx={{ width: 150 }}
+                  />
+                  <TextField
+                    label="Period A End"
+                    type="date"
+                    size="small"
+                    value={periodAEnd}
+                    onChange={(e) => setPeriodAEnd(e.target.value)}
+                    slotProps={{ shrink: true }}
+                    sx={{ width: 150 }}
+                  />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>vs</Typography>
+                  <TextField
+                    label="Period B Start"
+                    type="date"
+                    size="small"
+                    value={periodBStart}
+                    onChange={(e) => setPeriodBStart(e.target.value)}
+                    slotProps={{ shrink: true }}
+                    sx={{ width: 150 }}
+                  />
+                  <TextField
+                    label="Period B End"
+                    type="date"
+                    size="small"
+                    value={periodBEnd}
+                    onChange={(e) => setPeriodBEnd(e.target.value)}
+                    slotProps={{ shrink: true }}
+                    sx={{ width: 150 }}
+                  />
+                </Stack>
+              )}
             </Stack>
 
             {/* Parallel KPI Cards Deck */}
@@ -472,9 +675,14 @@ function AnalyticsDashboard() {
                 {/* Column A */}
                 <Grid xs={12} md={6}>
                   <Paper elevation={3} sx={{ p: 3, borderRadius: 3, border: '1px solid #bb86fc', bgcolor: 'rgba(187, 134, 252, 0.02)' }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 0.5, color: 'primary.main' }}>
                       {statItemA.key} Summary
                     </Typography>
+                    {compType === 'Periods' && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                        {periodAStart} to {periodAEnd}
+                      </Typography>
+                    )}
                     <Grid container spacing={2}>
                       <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Total Runs</Typography>
@@ -485,12 +693,12 @@ function AnalyticsDashboard() {
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.inningsBatted}</Typography>
                       </Grid>
                       <Grid xs={6}>
-                        <Typography variant="caption" color="text.secondary">Batting Average</Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.battingAverage}</Typography>
-                      </Grid>
-                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Runs / Dismissal</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.runsPerDismissal}</Typography>
+                      </Grid>
+                      <Grid xs={6}>
+                        <Typography variant="caption" color="text.secondary">Runs / Inning</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemA.battingAverage}</Typography>
                       </Grid>
                     </Grid>
                   </Paper>
@@ -499,9 +707,14 @@ function AnalyticsDashboard() {
                 {/* Column B */}
                 <Grid xs={12} md={6}>
                   <Paper elevation={3} sx={{ p: 3, borderRadius: 3, border: '1px solid #03dac6', bgcolor: 'rgba(3, 218, 198, 0.02)' }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: 'secondary.main' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 0.5, color: 'secondary.main' }}>
                       {statItemB.key} Summary
                     </Typography>
+                    {compType === 'Periods' && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                        {periodBStart} to {periodBEnd}
+                      </Typography>
+                    )}
                     <Grid container spacing={2}>
                       <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Total Runs</Typography>
@@ -512,12 +725,12 @@ function AnalyticsDashboard() {
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.inningsBatted}</Typography>
                       </Grid>
                       <Grid xs={6}>
-                        <Typography variant="caption" color="text.secondary">Batting Average</Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.battingAverage}</Typography>
-                      </Grid>
-                      <Grid xs={6}>
                         <Typography variant="caption" color="text.secondary">Runs / Dismissal</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.runsPerDismissal}</Typography>
+                      </Grid>
+                      <Grid xs={6}>
+                        <Typography variant="caption" color="text.secondary">Runs / Inning</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{statItemB.battingAverage}</Typography>
                       </Grid>
                     </Grid>
                   </Paper>

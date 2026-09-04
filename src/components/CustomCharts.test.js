@@ -62,6 +62,6 @@ describe('CustomCharts Components', () => {
 
     // Verify direct KPI titles inside chart legends exist
     expect(screen.getByText('Total Runs')).toBeInTheDocument();
-    expect(screen.getByText(/Batting Average/i)).toBeInTheDocument();
+    expect(screen.getByText(/Runs \/ Inning/i)).toBeInTheDocument();
   });
 });

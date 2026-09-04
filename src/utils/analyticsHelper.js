@@ -47,6 +47,8 @@ export const groupStatistics = (games, groupBy) => {
       key = g.club || 'Unknown';
     } else if (groupBy === 'Venue') {
       key = g.location || 'Unknown';
+    } else if (groupBy === 'Batting Position') {
+      key = g.batting_number ? `Position ${g.batting_number}` : 'No Position';
     }
 
     if (!groups[key]) {
@@ -71,7 +73,10 @@ export const groupStatistics = (games, groupBy) => {
       }
 
       // Record dismissal type
-      const dismissalType = g.dismissal || 'None';
+      let dismissalType = g.dismissal || 'None';
+      if (!g.is_out) {
+        dismissalType = 'Not Out';
+      }
       if (dismissalType !== 'None' && dismissalType !== 'DNB') {
         item.dismissals[dismissalType] = (item.dismissals[dismissalType] || 0) + 1;
       }
@@ -92,6 +97,11 @@ export const groupStatistics = (games, groupBy) => {
     // Sort months in calendar order, others alphabetically/numerically
     if (groupBy === 'Month') {
       return MONTH_NAMES.indexOf(a.key) - MONTH_NAMES.indexOf(b.key);
+    }
+    if (groupBy === 'Batting Position') {
+      const numA = a.key.includes('Position') ? parseInt(a.key.replace('Position ', ''), 10) : 999;
+      const numB = b.key.includes('Position') ? parseInt(b.key.replace('Position ', ''), 10) : 999;
+      return numA - numB;
     }
     return a.key.localeCompare(b.key);
   });

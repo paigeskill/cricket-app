@@ -16,6 +16,7 @@ function GroupBySelect({ value, onChange, labelId = "groupby-label" }) {
         <MenuItem value="Month">Month</MenuItem>
         <MenuItem value="Club">Club</MenuItem>
         <MenuItem value="Venue">Home / Away</MenuItem>
+        <MenuItem value="Batting Position">Batting Position</MenuItem>
       </Select>
     </FormControl>
   );

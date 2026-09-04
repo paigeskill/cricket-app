@@ -390,8 +390,8 @@ export function ComparativeBarChart({ itemA, itemB }) {
 
   const categories = [
     { label: 'Total Runs', valA: itemA.totalRuns || 0, valB: itemB.totalRuns || 0, maxVal: maxRuns },
-    { label: 'Batting Average', valA: itemA.battingAverage || 0, valB: itemB.battingAverage || 0, maxVal: maxAverage },
-    { label: 'Runs / Dismissal', valA: typeof itemA.runsPerDismissal === 'number' ? itemA.runsPerDismissal : 0, valB: typeof itemB.runsPerDismissal === 'number' ? itemB.runsPerDismissal : 0, maxVal: maxSRD }
+    { label: 'Runs / Dismissal', valA: typeof itemA.runsPerDismissal === 'number' ? itemA.runsPerDismissal : 0, valB: typeof itemB.runsPerDismissal === 'number' ? itemB.runsPerDismissal : 0, maxVal: maxSRD },
+    { label: 'Runs / Inning', valA: itemA.battingAverage || 0, valB: itemB.battingAverage || 0, maxVal: maxAverage }
   ];
 
   const barWidth = 24;

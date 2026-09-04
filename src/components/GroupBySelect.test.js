@@ -33,6 +33,7 @@ describe('GroupBySelect Component', () => {
     expect(within(listbox).getByRole('option', { name: 'Month' })).toBeInTheDocument();
     expect(within(listbox).getByRole('option', { name: 'Club' })).toBeInTheDocument();
     expect(within(listbox).getByRole('option', { name: 'Home / Away' })).toBeInTheDocument();
+    expect(within(listbox).getByRole('option', { name: 'Batting Position' })).toBeInTheDocument();
 
     // Click Month option
     const monthOption = within(listbox).getByRole('option', { name: 'Month' });

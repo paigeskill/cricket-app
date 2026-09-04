@@ -21,10 +21,12 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
+  slotProps: {
+    paper: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
     },
   },
 };
@@ -51,55 +53,66 @@ function AnalyticsFilters({
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'background.paper' }}>
       <Grid container spacing={3} sx={{ alignItems: 'center' }}>
-        {/* Row 1: Select Dropdowns (Wider md=6 each) */}
-        <Grid xs={12} md={6}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="analytics-years-label">Filter Years</InputLabel>
-            <Select
-              labelId="analytics-years-label"
-              id="analytics-years-select"
-              multiple
-              value={selectedYears}
-              onChange={(e) => onChangeYears(e.target.value)}
-              input={<OutlinedInput label="Filter Years" />}
-              renderValue={(selected) => selected.length === 0 ? 'All Years' : `${selected.length} Year${selected.length > 1 ? 's' : ''} Selected`}
-              MenuProps={MenuProps}
-            >
-              {years.map((year) => (
-                <MenuItem key={year} value={year}>
-                  <Checkbox checked={selectedYears.includes(year)} color="primary" />
-                  <ListItemText primary={year} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        {/* Years Filter Column */}
+        <Grid xs={12} sm={6} md={3}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+              Years
+            </Typography>
+            <FormControl fullWidth size="small" sx={{ minWidth: 180 }}>
+              <InputLabel id="analytics-years-label">Filter Years</InputLabel>
+              <Select
+                labelId="analytics-years-label"
+                id="analytics-years-select"
+                multiple
+                value={selectedYears}
+                onChange={(e) => onChangeYears(e.target.value)}
+                input={<OutlinedInput label="Filter Years" />}
+                renderValue={(selected) => selected.length === 0 ? 'All Years' : `${selected.length} Year${selected.length > 1 ? 's' : ''} Selected`}
+                MenuProps={MenuProps}
+              >
+                {years.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    <Checkbox checked={selectedYears.includes(year)} color="primary" />
+                    <ListItemText primary={year} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Grid>
 
-        <Grid xs={12} md={6}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="analytics-clubs-label">Filter Clubs</InputLabel>
-            <Select
-              labelId="analytics-clubs-label"
-              id="analytics-clubs-select"
-              multiple
-              value={selectedClubs}
-              onChange={(e) => onChangeClubs(e.target.value)}
-              input={<OutlinedInput label="Filter Clubs" />}
-              renderValue={(selected) => selected.length === 0 ? 'All Clubs' : `${selected.length} Club${selected.length > 1 ? 's' : ''} Selected`}
-              MenuProps={MenuProps}
-            >
-              {clubs.map((club) => (
-                <MenuItem key={club} value={club}>
-                  <Checkbox checked={selectedClubs.includes(club)} color="primary" />
-                  <ListItemText primary={club} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        {/* Clubs Filter Column */}
+        <Grid xs={12} sm={6} md={3}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+              Clubs
+            </Typography>
+            <FormControl fullWidth size="small" sx={{ minWidth: 180 }}>
+              <InputLabel id="analytics-clubs-label">Filter Clubs</InputLabel>
+              <Select
+                labelId="analytics-clubs-label"
+                id="analytics-clubs-select"
+                multiple
+                value={selectedClubs}
+                onChange={(e) => onChangeClubs(e.target.value)}
+                input={<OutlinedInput label="Filter Clubs" />}
+                renderValue={(selected) => selected.length === 0 ? 'All Clubs' : `${selected.length} Club${selected.length > 1 ? 's' : ''} Selected`}
+                MenuProps={MenuProps}
+              >
+                {clubs.map((club) => (
+                  <MenuItem key={club} value={club}>
+                    <Checkbox checked={selectedClubs.includes(club)} color="primary" />
+                    <ListItemText primary={club} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Grid>
 
-        {/* Row 2: Location and Reset Action */}
-        <Grid xs={12} sm={8} md={9}>
+        {/* Home / Away Venue Filter Column */}
+        <Grid xs={12} sm={8} md={3.5}>
           <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
               Home / Away
@@ -120,8 +133,12 @@ function AnalyticsFilters({
           </Box>
         </Grid>
 
-        <Grid xs={12} sm={4} md={3}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', pt: 2.2 }}>
+        {/* Clear Filters Button Column */}
+        <Grid xs={12} sm={4} md={2.5}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <Typography variant="caption" sx={{ mb: 0.5, visibility: 'hidden' }}>
+              Spacer
+            </Typography>
             <Button
               variant="outlined"
               color="inherit"
