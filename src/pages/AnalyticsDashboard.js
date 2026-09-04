@@ -29,6 +29,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import AnalyticsFilters from '../components/AnalyticsFilters';
 import GroupBySelect from '../components/GroupBySelect';
 import CricketTable from '../components/CricketTable';
+import StatsCard from '../components/StatsCard';
 import { initialMockGames } from '../data/mockData';
 import {
   filterGames,
@@ -305,52 +306,16 @@ function AnalyticsDashboard() {
       {/* Quick Summary Card Grid */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Subset Innings Batted
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                {totalInnings}
-              </Typography>
-            </CardContent>
-          </Card>
+          <StatsCard title="Subset Innings Batted" value={totalInnings} color="primary.main" />
         </Grid>
         <Grid xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Subset Total Runs
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'secondary.main' }}>
-                {totalRuns}
-              </Typography>
-            </CardContent>
-          </Card>
+          <StatsCard title="Subset Total Runs" value={totalRuns} color="secondary.main" />
         </Grid>
         <Grid xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Subset Runs / Dismissal
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.main' }}>
-                {overallSRD}
-              </Typography>
-            </CardContent>
-          </Card>
+          <StatsCard title="Subset Runs / Dismissal" value={overallSRD} color="warning.main" />
         </Grid>
         <Grid xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 3, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Subset Runs / Inning
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                {overallAvg}
-              </Typography>
-            </CardContent>
-          </Card>
+          <StatsCard title="Subset Runs / Inning" value={overallAvg} color="success.main" />
         </Grid>
       </Grid>
 
