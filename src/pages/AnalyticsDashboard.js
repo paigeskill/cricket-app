@@ -30,6 +30,7 @@ import AnalyticsFilters from '../components/AnalyticsFilters';
 import GroupBySelect from '../components/GroupBySelect';
 import CricketTable from '../components/CricketTable';
 import StatsCard from '../components/StatsCard';
+import TabPanel from '../components/TabPanel';
 import { initialMockGames } from '../data/mockData';
 import {
   filterGames,
@@ -46,25 +47,7 @@ import {
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`analytics-panel-${index}`}
-      aria-labelledby={`analytics-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
 
 function AnalyticsDashboard() {
   const navigate = useNavigate();
@@ -329,7 +312,7 @@ function AnalyticsDashboard() {
       </Box>
 
       {/* Tab 1: Runs & Averages */}
-      <TabPanel value={activeTab} index={0}>
+      <TabPanel prefix="analytics" value={activeTab} index={0}>
         <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 3 }}>
           {/* Grouping Select dropdown */}
           <GroupBySelect value={groupBy} onChange={setGroupBy} labelId="groupby" />
@@ -398,7 +381,7 @@ function AnalyticsDashboard() {
       </TabPanel>
 
       {/* Tab 2: Dismissal Breakdown */}
-      <TabPanel value={activeTab} index={1}>
+      <TabPanel prefix="analytics" value={activeTab} index={1}>
         <Stack sx={{ flexDirection: 'row', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 3 }}>
           {/* Dismissal Group By Dimension */}
           <GroupBySelect value={dismissalGroupBy} onChange={setDismissalGroupBy} labelId="dismissal-groupby" />
@@ -473,7 +456,7 @@ function AnalyticsDashboard() {
       </TabPanel>
 
       {/* Tab 3: Comparative Analysis */}
-      <TabPanel value={activeTab} index={2}>
+      <TabPanel prefix="analytics" value={activeTab} index={2}>
         {filteredGames.length < 2 ? (
           <Paper elevation={3} sx={{ p: 4, borderRadius: 3, textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.05)', bgcolor: 'background.paper' }}>
             <Typography variant="h6" color="text.secondary">

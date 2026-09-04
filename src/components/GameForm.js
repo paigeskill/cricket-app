@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import TabPanel from './TabPanel';
 
 const DISMISSAL_METHODS = [
   'None',
@@ -33,25 +34,7 @@ const DISMISSAL_METHODS = [
   'Retired Hurt'
 ];
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`cricket-form-tabpanel-${index}`}
-      aria-labelledby={`cricket-form-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
 
 function GameForm({ onSave, initialData, defaultTab, onDelete }) {
   const [tabIndex, setTabIndex] = useState(defaultTab || 0);
@@ -114,6 +97,7 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
     if (!formData.date) tempErrors.date = 'Date is required';
     if (!formData.club || !formData.club.trim()) tempErrors.club = 'Club is required';
     if (!formData.opponent || !formData.opponent.trim()) tempErrors.opponent = 'Opponent is required';
+    if (!formData.location || !formData.location.trim()) tempErrors.location = 'Location is required';
     
     // Batting Validation (Tab 1, Only if they batted)
     if (!formData.did_not_bat) {
@@ -193,7 +177,7 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
 
     // If validation fails, navigate the tab automatically to focus on the first error category
     if (Object.keys(tempErrors).length > 0) {
-      if (tempErrors.date || tempErrors.club || tempErrors.opponent) {
+      if (tempErrors.date || tempErrors.club || tempErrors.opponent || tempErrors.location) {
         setTabIndex(0);
       } else if (tempErrors.runs_scored || tempErrors.batting_number || tempErrors.dismissal) {
         setTabIndex(1);
@@ -308,7 +292,7 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
         </Box>
 
         {/* Category 1: Game Info */}
-        <TabPanel value={tabIndex} index={0}>
+        <TabPanel prefix="cricket-form" value={tabIndex} index={0}>
           <Stack spacing={3}>
             <TextField
               name="date"
@@ -342,7 +326,7 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
               fullWidth
             />
 
-            <FormControl fullWidth>
+            <FormControl fullWidth error={!!errors.location}>
               <InputLabel id="location-label">Location</InputLabel>
               <Select
                 labelId="location-label"
@@ -355,12 +339,13 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
                 <MenuItem value="Home">Home Match</MenuItem>
                 <MenuItem value="Away">Away Match</MenuItem>
               </Select>
+              {errors.location && <FormHelperText>{errors.location}</FormHelperText>}
             </FormControl>
           </Stack>
         </TabPanel>
 
         {/* Category 2: Batting Stats */}
-        <TabPanel value={tabIndex} index={1}>
+        <TabPanel prefix="cricket-form" value={tabIndex} index={1}>
           <Stack spacing={3}>
             <FormControlLabel
               control={
@@ -438,7 +423,7 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
         </TabPanel>
 
         {/* Category 3: Bowling Stats */}
-        <TabPanel value={tabIndex} index={2}>
+        <TabPanel prefix="cricket-form" value={tabIndex} index={2}>
           <Stack spacing={3}>
             <Typography variant="subtitle1" color="text.secondary">
               Leave blank or set to 0 if you did not bowl in this match.
@@ -494,8 +479,8 @@ function GameForm({ onSave, initialData, defaultTab, onDelete }) {
           </Stack>
         </TabPanel>
 
-        {/* Category 4: Fielding Stats */}
-        <TabPanel value={tabIndex} index={3}>
+        {/* Category 4: Wicketkeeping Stats */}
+        <TabPanel prefix="cricket-form" value={tabIndex} index={3}>
           <Stack spacing={3}>
             <Typography variant="subtitle1" color="text.secondary">
               Fill in fielding stats if you caught, ran out, or kept wicket in this match.

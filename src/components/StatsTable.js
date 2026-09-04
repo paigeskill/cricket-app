@@ -17,26 +17,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import CricketTable from './CricketTable';
 import GameRowCells from './GameRowCells';
 import StatsCard from './StatsCard';
+import TabPanel from './TabPanel';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`cricket-stats-tabpanel-${index}`}
-      aria-labelledby={`cricket-stats-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ pt: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
 
 function StatsTable({ games, onEditGame }) {
   const [activeTab, setActiveTab] = useState(0);
@@ -300,7 +283,7 @@ function StatsTable({ games, onEditGame }) {
       </Box>
 
       {/* Batting Scorecard Tab */}
-      <TabPanel value={activeTab} index={0}>
+      <TabPanel prefix="cricket-stats" value={activeTab} index={0}>
         <CricketTable
           headerColor="primary.dark"
           headers={battingHeaders}
@@ -366,7 +349,7 @@ function StatsTable({ games, onEditGame }) {
       </TabPanel>
 
       {/* Bowling Scorecard Tab */}
-      <TabPanel value={activeTab} index={1}>
+      <TabPanel prefix="cricket-stats" value={activeTab} index={1}>
         <CricketTable
           headerColor="secondary.dark"
           headers={bowlingHeaders}
@@ -399,7 +382,7 @@ function StatsTable({ games, onEditGame }) {
       </TabPanel>
 
       {/* Fielding Scorecard Tab */}
-      <TabPanel value={activeTab} index={2}>
+      <TabPanel prefix="cricket-stats" value={activeTab} index={2}>
         <CricketTable
           headerColor="warning.dark"
           headers={fieldingHeaders}

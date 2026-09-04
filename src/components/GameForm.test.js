@@ -302,4 +302,35 @@ describe('GameForm Component', () => {
     expect(screen.getByLabelText(/Stumpings Taken/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Byes Conceded/i)).toBeInTheDocument();
   });
+
+  test('displays validation errors for missing compulsory fields', async () => {
+    render(<GameForm onSave={mockOnSave} />);
+
+    // Clear date input
+    fireEvent.change(screen.getByLabelText(/Game Date/i), { target: { value: '' } });
+
+    // Submit empty form
+    const submitButton = screen.getByRole('button', { name: /Save Game Details/i });
+    fireEvent.click(submitButton);
+
+    // Verify errors appear
+    expect(screen.getByText('Date is required')).toBeInTheDocument();
+    expect(screen.getByText('Club is required')).toBeInTheDocument();
+    expect(screen.getByText('Opponent is required')).toBeInTheDocument();
+  });
+
+  test('displays location validation error if location is empty', async () => {
+    const invalidData = {
+      date: '2026-08-27',
+      club: 'Club A',
+      opponent: 'Club B',
+      location: ''
+    };
+    render(<GameForm onSave={mockOnSave} initialData={invalidData} />);
+
+    const submitButton = screen.getByRole('button', { name: /Save Game Details/i });
+    fireEvent.click(submitButton);
+
+    expect(screen.getByText('Location is required')).toBeInTheDocument();
+  });
 });
