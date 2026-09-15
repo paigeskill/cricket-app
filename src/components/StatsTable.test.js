@@ -151,11 +151,18 @@ describe('StatsTable Component', () => {
     expect(screen.getByText('4')).toBeInTheDocument(); // Wicketkeeper byes in Game 2
   });
 
-  test('clicking edit button triggers onEditGame callback prop', () => {
+  test('clicking edit button triggers onEditGame callback prop and respects sorting', async () => {
     const mockOnEdit = jest.fn();
     render(<StatsTable games={mockGames} onEditGame={mockOnEdit} />);
 
-    // Get Edit button on the first row of batting scorecard
+    // Sort by Oldest - Newest first to bring mockGames[0] to the top
+    const sortSelect = screen.getByRole('combobox', { name: /Sort Matches/i });
+    fireEvent.mouseDown(sortSelect);
+    
+    const oldestOption = screen.getByRole('option', { name: /Oldest - Newest/i });
+    fireEvent.click(oldestOption);
+
+    // Get Edit button on the first row of batting scorecard (which is now mockGames[0] because of oldest sort)
     const editButtons = screen.getAllByRole('button', { name: /edit batting performance/i });
     fireEvent.click(editButtons[0]);
 

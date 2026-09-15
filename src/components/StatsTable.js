@@ -9,7 +9,11 @@ import {
   TableRow,
   IconButton,
   ToggleButtonGroup,
-  ToggleButton
+  ToggleButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
@@ -24,15 +28,27 @@ import TabPanel from './TabPanel';
 function StatsTable({ games, onEditGame }) {
   const [activeTab, setActiveTab] = useState(0);
   const [statsRange, setStatsRange] = useState('Current Year');
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest' | 'oldest'
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  // Filter games specifically for aggregate summary cards calculations
+  // Filter games specifically for aggregate summary cards calculations and display
   const summaryGames = statsRange === 'Current Year'
     ? games.filter(g => g.date && g.date.substring(0, 4) === '2026')
     : games;
+
+  // Apply sorting (Oldest-Newest or Newest-Oldest based on date strings)
+  const sortedGames = [...summaryGames].sort((a, b) => {
+    const dateA = a.date || '';
+    const dateB = b.date || '';
+    if (sortOrder === 'newest') {
+      return dateB.localeCompare(dateA); // Newest to oldest
+    } else {
+      return dateA.localeCompare(dateB); // Oldest to newest
+    }
+  });
 
   // --- BATTING CALCULATIONS (using filtered summaryGames) ---
   const totalMatches = summaryGames.length;
@@ -144,18 +160,33 @@ function StatsTable({ games, onEditGame }) {
 
   return (
     <Box sx={{ width: '100%' }}>
-      {/* Range filter toggle */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+      {/* Controls: Sort and Range Filters */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+        {/* Sort Select Box */}
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel id="stats-sort-label">Sort Matches</InputLabel>
+          <Select
+            labelId="stats-sort-label"
+            id="stats-sort-select"
+            value={sortOrder}
+            label="Sort Matches"
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <MenuItem value="newest">Newest - Oldest</MenuItem>
+            <MenuItem value="oldest">Oldest - Newest</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Range filter toggle */}
         <ToggleButtonGroup
           color="primary"
           value={statsRange}
           exclusive
           onChange={(e, val) => val && setStatsRange(val)}
           size="small"
-          aria-label="stats time range"
         >
           <ToggleButton value="Current Year" aria-label="current year stats" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
-            Current Year (2026)
+            Current Year
           </ToggleButton>
           <ToggleButton value="All Time" aria-label="all time stats" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
             All Time
@@ -287,9 +318,9 @@ function StatsTable({ games, onEditGame }) {
         <CricketTable
           headerColor="primary.dark"
           headers={battingHeaders}
-          isEmpty={games.length === 0}
+          isEmpty={sortedGames.length === 0}
         >
-          {games.map((game) => {
+          {sortedGames.map((game) => {
             const isDnb = game.did_not_bat || game.runs_scored === null;
             return (
               <TableRow
@@ -353,9 +384,9 @@ function StatsTable({ games, onEditGame }) {
         <CricketTable
           headerColor="secondary.dark"
           headers={bowlingHeaders}
-          isEmpty={games.length === 0}
+          isEmpty={sortedGames.length === 0}
         >
-          {games.map((game) => {
+          {sortedGames.map((game) => {
             const stats = getBowlingRowStats(game);
             return (
               <TableRow
@@ -386,9 +417,9 @@ function StatsTable({ games, onEditGame }) {
         <CricketTable
           headerColor="warning.dark"
           headers={fieldingHeaders}
-          isEmpty={games.length === 0}
+          isEmpty={sortedGames.length === 0}
         >
-          {games.map((game) => {
+          {sortedGames.map((game) => {
             const isKeeper = game.is_keeper || false;
             const keeperCatches = isKeeper ? (game.catches_keeper || 0) : 0;
             const stumpings = game.stumpings || 0;
